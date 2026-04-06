@@ -1,10 +1,10 @@
 /**
  * Cloudflare Pages Function: /api/maths
- * Generates Further Maths A-Level problems and marks answers.
+ * Generates A-Level problems and marks answers for multiple subjects.
  *
  * POST /api/maths
- * Body: { action: "generate" } — returns 4 problems
- * Body: { action: "mark", problems: [...] } — marks submitted answers
+ * Body: { action: "generate", subject: "further-maths"|"physics"|"maths" }
+ * Body: { action: "mark", subject: "...", problems: [...] }
  */
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
@@ -14,6 +14,41 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+const SUBJECTS = {
+  'further-maths': {
+    name: 'Further Mathematics',
+    spec: 'H245',
+    topics: `- Complex numbers (including argand diagrams, loci, de Moivre's theorem)
+- Matrices (including transformations, eigenvalues, eigenvectors, Cayley-Hamilton)
+- Further calculus (Maclaurin/Taylor series, improper integrals, calculus of inverse trig functions)
+- Proof (by induction, contradiction)
+- Polar coordinates (sketching curves, areas)
+- Hyperbolic functions (definitions, identities, calculus)
+- Differential equations (first and second order, including auxiliary equations)
+- Vectors (lines, planes, scalar and vector products)`,
+    notation: 'Use proper mathematical notation where possible (e.g. x², √, π, ∫, Σ, ∞, θ, ≤, ≥).',
+  },
+  'physics': {
+    name: 'Physics A',
+    spec: 'H556',
+    topics: `- Module 1: Development of practical skills in physics
+- Module 2: Foundations of physics (physical quantities, SI units, estimation)
+- Module 3: Forces and motion (motion, forces, work/energy/power, materials, Newton's laws, momentum)
+- Module 4: Electrons, waves and photons (charge and current, energy/power/resistance, electrical circuits, waves, quantum physics)
+- Module 5: Newtonian world and astrophysics (thermal physics, circular motion, oscillations, gravitational fields, astrophysics and cosmology)
+- Module 6: Particles and medical physics (capacitors, electric fields, electromagnetism, nuclear and particle physics, medical imaging)`,
+    notation: 'Use proper scientific notation and SI units. Include values of constants where needed (e.g. g = 9.81 m s⁻², c = 3.00 × 10⁸ m s⁻¹).',
+  },
+  'maths': {
+    name: 'Mathematics A',
+    spec: 'H240',
+    topics: `- Pure Mathematics: proof, algebra and functions, coordinate geometry, sequences and series, trigonometry, exponentials and logarithms, differentiation, integration, numerical methods, vectors
+- Statistics: statistical sampling, data presentation and interpretation, probability, statistical distributions (binomial, normal), statistical hypothesis testing
+- Mechanics: quantities and units in mechanics, kinematics, forces and Newton's laws, moments`,
+    notation: 'Use proper mathematical notation where possible (e.g. x², √, π, ∫, Σ, ∞, θ, ≤, ≥, dy/dx).',
+  },
 };
 
 export async function onRequestOptions() {
@@ -33,32 +68,30 @@ export async function onRequestPost({ request, env }) {
     return jsonError('Invalid JSON body.', 400);
   }
 
-  const { action } = body;
+  const { action, subject = 'further-maths' } = body;
+  const subjectConfig = SUBJECTS[subject];
+
+  if (!subjectConfig) {
+    return jsonError(`Unknown subject: ${subject}. Use: ${Object.keys(SUBJECTS).join(', ')}`, 400);
+  }
 
   if (action === 'generate') {
-    return generateProblems(apiKey);
+    return generateProblems(apiKey, subjectConfig);
   } else if (action === 'mark') {
-    return markAnswers(apiKey, body.problems);
+    return markAnswers(apiKey, subjectConfig, body.problems);
   } else {
     return jsonError('Invalid action. Use "generate" or "mark".', 400);
   }
 }
 
-async function generateProblems(apiKey) {
-  const systemPrompt = `You are an A-Level Further Mathematics examiner for the OCR exam board (specification H245).
-Generate challenging but fair exam-style questions that match the OCR Further Maths A-Level syllabus.
+async function generateProblems(apiKey, subject) {
+  const systemPrompt = `You are an A-Level ${subject.name} examiner for the OCR exam board (specification ${subject.spec}).
+Generate challenging but fair exam-style questions that match the OCR ${subject.name} A-Level syllabus.
 Always use British English. Questions should match the style and difficulty of real OCR past papers.
 Respond ONLY with valid JSON — no markdown, no backticks, no preamble.`;
 
-  const userPrompt = `Generate exactly 4 A-Level Further Maths problems following the OCR Further Mathematics A-Level syllabus (H245). Cover a mix of these OCR specification topics:
-- Complex numbers (including argand diagrams, loci, de Moivre's theorem)
-- Matrices (including transformations, eigenvalues, eigenvectors, Cayley-Hamilton)
-- Further calculus (Maclaurin/Taylor series, improper integrals, calculus of inverse trig functions)
-- Proof (by induction, contradiction)
-- Polar coordinates (sketching curves, areas)
-- Hyperbolic functions (definitions, identities, calculus)
-- Differential equations (first and second order, including auxiliary equations)
-- Vectors (lines, planes, scalar and vector products)
+  const userPrompt = `Generate exactly 4 A-Level ${subject.name} problems following the OCR ${subject.name} A-Level syllabus (${subject.spec}). Cover a mix of these OCR specification topics:
+${subject.topics}
 
 Each problem should be exam-style, worth 4-6 marks, and solvable in about 5 minutes.
 
@@ -72,7 +105,7 @@ Return this exact JSON structure:
   ]
 }
 
-Use proper mathematical notation where possible (e.g. x², √, π, ∫, Σ, ∞, θ, ≤, ≥).`;
+${subject.notation}`;
 
   const data = await callGroq(apiKey, systemPrompt, userPrompt);
   if (data.error) return jsonError(data.error, data.status);
@@ -84,12 +117,12 @@ Use proper mathematical notation where possible (e.g. x², √, π, ∫, Σ, ∞
   return jsonResponse({ problems: data.parsed.problems.slice(0, 4) });
 }
 
-async function markAnswers(apiKey, problems) {
+async function markAnswers(apiKey, subject, problems) {
   if (!Array.isArray(problems) || problems.length === 0) {
     return jsonError('Please provide problems with answers to mark.', 400);
   }
 
-  const systemPrompt = `You are a rigorous but encouraging OCR A-Level Further Mathematics examiner marking student work.
+  const systemPrompt = `You are a rigorous but encouraging OCR A-Level ${subject.name} examiner marking student work.
 Mark each answer carefully following OCR mark scheme conventions, awarding method marks (M), accuracy marks (A), and bonus marks (B) where appropriate. Award partial marks for correct working even if the final answer is wrong.
 Use British English. Be specific about where marks are awarded or lost.
 Respond ONLY with valid JSON — no markdown, no backticks, no preamble.`;
@@ -98,7 +131,7 @@ Respond ONLY with valid JSON — no markdown, no backticks, no preamble.`;
     `Problem ${i + 1} (${p.marks} marks): ${p.question}\nStudent's working: ${p.working || '(no working shown)'}\nStudent's answer: ${p.answer || '(no answer given)'}`
   ).join('\n\n');
 
-  const userPrompt = `Mark the following A-Level Further Maths answers:
+  const userPrompt = `Mark the following A-Level ${subject.name} answers:
 
 ${problemsText}
 

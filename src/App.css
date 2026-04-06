@@ -356,15 +356,18 @@ body {
   letter-spacing: 0.05em;
 }
 
-/* ─── Maths Button ─── */
-.btn-maths {
-  display: block;
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #AA96DA, #8B6FC0);
+/* ─── Subject Buttons ─── */
+.subject-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-subject {
+  flex: 1;
+  padding: 14px 8px;
   color: #fff;
   font-family: var(--font-heading);
-  font-size: 1.05rem;
+  font-size: 0.9rem;
   font-weight: 700;
   border: none;
   border-radius: 12px;
@@ -372,9 +375,32 @@ body {
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.btn-maths:hover {
+.btn-subject:hover {
   transform: translateY(-2px);
+}
+
+.btn-further-maths {
+  background: linear-gradient(135deg, #AA96DA, #8B6FC0);
+}
+
+.btn-further-maths:hover {
   box-shadow: 0 6px 24px rgba(170, 150, 218, 0.3);
+}
+
+.btn-maths {
+  background: linear-gradient(135deg, var(--accent), #d4b83d);
+}
+
+.btn-maths:hover {
+  box-shadow: 0 6px 24px rgba(255, 230, 109, 0.3);
+}
+
+.btn-physics {
+  background: linear-gradient(135deg, var(--accent-2), #2d9e93);
+}
+
+.btn-physics:hover {
+  box-shadow: 0 6px 24px rgba(78, 205, 196, 0.3);
 }
 
 /* ─── Further Maths ─── */
@@ -618,5 +644,9 @@ body {
 
   .card {
     padding: 20px 16px;
+  }
+
+  .subject-buttons {
+    flex-direction: column;
   }
 }

@@ -3,7 +3,14 @@ import { jsPDF } from 'jspdf';
 
 const STEPS = { LOADING: 'loading', PROBLEMS: 'problems', MARKING: 'marking', RESULTS: 'results' };
 
-export default function FurtherMaths({ onBack }) {
+const SUBJECT_CONFIG = {
+  'further-maths': { label: 'Further Maths A-Level', badge: '📐', colour: '#AA96DA' },
+  'physics': { label: 'Physics A-Level', badge: '⚛️', colour: '#4ECDC4' },
+  'maths': { label: 'Maths A-Level', badge: '📊', colour: '#FFE66D' },
+};
+
+export default function FurtherMaths({ onBack, subject = 'further-maths' }) {
+  const config = SUBJECT_CONFIG[subject];
   const [step, setStep] = useState(STEPS.LOADING);
   const [problems, setProblems] = useState([]);
   const [answers, setAnswers] = useState({});
@@ -22,7 +29,7 @@ export default function FurtherMaths({ onBack }) {
       const res = await fetch('/api/maths', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'generate' }),
+        body: JSON.stringify({ action: 'generate', subject }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
@@ -60,7 +67,7 @@ export default function FurtherMaths({ onBack }) {
       const res = await fetch('/api/maths', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'mark', problems: submission }),
+        body: JSON.stringify({ action: 'mark', subject, problems: submission }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
@@ -120,7 +127,7 @@ export default function FurtherMaths({ onBack }) {
 
     doc.setFontSize(16);
     doc.setTextColor(170, 150, 218);
-    doc.text('Further Mathematics A-Level Practice', w / 2, 108, { align: 'center' });
+    doc.text(`${config.label} Practice`, w / 2, 108, { align: 'center' });
 
     // Load and add Nathan's photo
     try {
@@ -163,7 +170,7 @@ export default function FurtherMaths({ onBack }) {
         <div className="card card-center">
           <div className="spinner" />
           <p className="loading-title">Generating problems...</p>
-          <p className="loading-sub">Further Maths isn't going to do itself, Nathan</p>
+          <p className="loading-sub">{config.label} isn't going to do itself, Nathan</p>
         </div>
       )}
 
@@ -179,7 +186,7 @@ export default function FurtherMaths({ onBack }) {
       {/* Problems */}
       {step === STEPS.PROBLEMS && (
         <div className="card">
-          <span className="badge">📐 Further Maths A-Level</span>
+          <span className="badge">{config.badge} {config.label}</span>
 
           {error && <p className="error-msg">{error}</p>}
 

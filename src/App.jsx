@@ -9,7 +9,8 @@ const STEPS = { INPUT: 'input', LOADING: 'loading', RESULTS: 'results' };
 
 export default function App() {
   const [step, setStep] = useState(STEPS.INPUT);
-  const [mode, setMode] = useState('decision'); // 'decision' or 'maths'
+  const [mode, setMode] = useState('decision'); // 'decision' or 'study'
+  const [subject, setSubject] = useState(null);
   const [interests, setInterests] = useState('');
   const [goals, setGoals] = useState('');
   const [plan, setPlan] = useState('');
@@ -78,9 +79,13 @@ export default function App() {
 
       <main className="app-main">
 
-        {/* ─── FURTHER MATHS MODE ─── */}
-        {mode === 'maths' && (
-          <FurtherMaths onBack={() => setMode('decision')} />
+        {/* ─── STUDY MODE ─── */}
+        {mode === 'study' && (
+          <FurtherMaths
+            key={subject}
+            subject={subject}
+            onBack={() => { setMode('decision'); setSubject(null); }}
+          />
         )}
 
         {/* ─── INPUT STEP ─── */}
@@ -119,12 +124,20 @@ export default function App() {
             </button>
 
             <div className="divider">
-              <span className="divider-text">or</span>
+              <span className="divider-text">or revise</span>
             </div>
 
-            <button className="btn-maths" onClick={() => setMode('maths')}>
-              📐 Further Maths Practice
-            </button>
+            <div className="subject-buttons">
+              <button className="btn-subject btn-further-maths" onClick={() => { setSubject('further-maths'); setMode('study'); }}>
+                📐 Further Maths
+              </button>
+              <button className="btn-subject btn-maths" onClick={() => { setSubject('maths'); setMode('study'); }}>
+                📊 Maths
+              </button>
+              <button className="btn-subject btn-physics" onClick={() => { setSubject('physics'); setMode('study'); }}>
+                ⚛️ Physics
+              </button>
+            </div>
           </div>
         )}
 

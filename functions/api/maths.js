@@ -45,18 +45,20 @@ export async function onRequestPost({ request, env }) {
 }
 
 async function generateProblems(apiKey) {
-  const systemPrompt = `You are an A-Level Further Mathematics examiner. Generate challenging but fair exam-style questions.
-Always use British English and follow the Edexcel/AQA Further Maths A-Level syllabus.
+  const systemPrompt = `You are an A-Level Further Mathematics examiner for the OCR exam board (specification H245).
+Generate challenging but fair exam-style questions that match the OCR Further Maths A-Level syllabus.
+Always use British English. Questions should match the style and difficulty of real OCR past papers.
 Respond ONLY with valid JSON — no markdown, no backticks, no preamble.`;
 
-  const userPrompt = `Generate exactly 4 A-Level Further Maths problems. Cover a mix of these topics:
-- Complex numbers
-- Matrices
-- Further calculus (integration techniques, differential equations)
-- Proof by induction
-- Hyperbolic functions
-- Polar coordinates
-- Series and sequences
+  const userPrompt = `Generate exactly 4 A-Level Further Maths problems following the OCR Further Mathematics A-Level syllabus (H245). Cover a mix of these OCR specification topics:
+- Complex numbers (including argand diagrams, loci, de Moivre's theorem)
+- Matrices (including transformations, eigenvalues, eigenvectors, Cayley-Hamilton)
+- Further calculus (Maclaurin/Taylor series, improper integrals, calculus of inverse trig functions)
+- Proof (by induction, contradiction)
+- Polar coordinates (sketching curves, areas)
+- Hyperbolic functions (definitions, identities, calculus)
+- Differential equations (first and second order, including auxiliary equations)
+- Vectors (lines, planes, scalar and vector products)
 
 Each problem should be exam-style, worth 4-6 marks, and solvable in about 5 minutes.
 
@@ -87,8 +89,8 @@ async function markAnswers(apiKey, problems) {
     return jsonError('Please provide problems with answers to mark.', 400);
   }
 
-  const systemPrompt = `You are a rigorous but encouraging A-Level Further Mathematics examiner marking student work.
-Mark each answer carefully, awarding partial marks for correct working even if the final answer is wrong.
+  const systemPrompt = `You are a rigorous but encouraging OCR A-Level Further Mathematics examiner marking student work.
+Mark each answer carefully following OCR mark scheme conventions, awarding method marks (M), accuracy marks (A), and bonus marks (B) where appropriate. Award partial marks for correct working even if the final answer is wrong.
 Use British English. Be specific about where marks are awarded or lost.
 Respond ONLY with valid JSON — no markdown, no backticks, no preamble.`;
 

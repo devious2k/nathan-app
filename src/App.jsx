@@ -9,6 +9,9 @@ import LunchPlanner from './components/LunchPlanner.jsx';
 import DrivingCalendar from './components/DrivingCalendar.jsx';
 import RevisionCalendar from './components/RevisionCalendar.jsx';
 import Notifications from './components/Notifications.jsx';
+import Activities from './components/Activities.jsx';
+import JobSearch from './components/JobSearch.jsx';
+import Goals from './components/Goals.jsx';
 
 // This option is ALWAYS first on the wheel — non-negotiable
 const MANDATORY_FIRST = "Check Jamie has Coca Cola and go to Simon's 🥤";
@@ -191,6 +194,11 @@ export default function App() {
                 <span className="tab-menu-label">Find Apprenticeships</span>
                 <span className="tab-menu-desc">Level 4, 5 & 6</span>
               </button>
+              <button className="tab-menu-item" onClick={() => setMode('jobs')}>
+                <span className="tab-menu-icon">💷</span>
+                <span className="tab-menu-label">Part-Time Jobs</span>
+                <span className="tab-menu-desc">Search by location</span>
+              </button>
               <button className="tab-menu-item" onClick={() => setMode('cv')}>
                 <span className="tab-menu-icon">📝</span>
                 <span className="tab-menu-label">CV Generator</span>
@@ -202,6 +210,9 @@ export default function App() {
         {tab === 'career' && mode === 'apprenticeships' && (
           <Apprenticeships onBack={() => setMode(null)} />
         )}
+        {tab === 'career' && mode === 'jobs' && (
+          <JobSearch onBack={() => setMode(null)} />
+        )}
         {tab === 'career' && mode === 'cv' && (
           <CVGenerator onBack={() => setMode(null)} />
         )}
@@ -212,6 +223,16 @@ export default function App() {
             <h2 className="tab-menu-title">🍽️ Life</h2>
             <p className="tab-menu-sub">The boring bits, sorted.</p>
             <div className="tab-menu-grid">
+              <button className="tab-menu-item" onClick={() => setMode('activities')}>
+                <span className="tab-menu-icon">🎯</span>
+                <span className="tab-menu-label">Things To Do</span>
+                <span className="tab-menu-desc">Next 2 weeks near you</span>
+              </button>
+              <button className="tab-menu-item" onClick={() => setMode('goals')}>
+                <span className="tab-menu-icon">🏆</span>
+                <span className="tab-menu-label">Goals</span>
+                <span className="tab-menu-desc">Track your targets</span>
+              </button>
               <button className="tab-menu-item" onClick={() => setMode('lunch')}>
                 <span className="tab-menu-icon">🥪</span>
                 <span className="tab-menu-label">Lunch Planner</span>
@@ -230,6 +251,8 @@ export default function App() {
             </div>
           </div>
         )}
+        {tab === 'life' && mode === 'activities' && <Activities onBack={() => setMode(null)} />}
+        {tab === 'life' && mode === 'goals' && <Goals onBack={() => setMode(null)} />}
         {tab === 'life' && mode === 'lunch' && <LunchPlanner onBack={() => setMode(null)} />}
         {tab === 'life' && mode === 'driving' && <DrivingCalendar onBack={() => setMode(null)} />}
         {tab === 'life' && mode === 'spotify' && <SpotifyPicker onBack={() => setMode(null)} />}

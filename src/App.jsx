@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import SpinWheel from './components/SpinWheel.jsx';
 import FurtherMaths from './components/FurtherMaths.jsx';
+import Apprenticeships from './components/Apprenticeships.jsx';
+import CVGenerator from './components/CVGenerator.jsx';
 
 // This option is ALWAYS first on the wheel — non-negotiable
 const MANDATORY_FIRST = "Check Jamie has Coca Cola and go to Simon's 🥤";
@@ -88,6 +90,16 @@ export default function App() {
           />
         )}
 
+        {/* ─── APPRENTICESHIPS MODE ─── */}
+        {mode === 'apprenticeships' && (
+          <Apprenticeships onBack={() => setMode('decision')} />
+        )}
+
+        {/* ─── CV GENERATOR MODE ─── */}
+        {mode === 'cv' && (
+          <CVGenerator onBack={() => setMode('decision')} />
+        )}
+
         {/* ─── INPUT STEP ─── */}
         {mode === 'decision' && step === STEPS.INPUT && (
           <div className="card">
@@ -136,6 +148,19 @@ export default function App() {
               </button>
               <button className="btn-subject btn-physics" onClick={() => { setSubject('physics'); setMode('study'); }}>
                 ⚛️ Physics
+              </button>
+            </div>
+
+            <div className="divider">
+              <span className="divider-text">or sort your career</span>
+            </div>
+
+            <div className="career-buttons">
+              <button className="btn-career btn-apprenticeships" onClick={() => setMode('apprenticeships')}>
+                💼 Find Apprenticeships
+              </button>
+              <button className="btn-career btn-cv" onClick={() => setMode('cv')}>
+                📝 CV Generator
               </button>
             </div>
           </div>

@@ -1085,6 +1085,76 @@ body {
   font-size: 1.1rem;
 }
 
+/* Spotify Player */
+.spotify-player-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 14px;
+  border: 1px solid #1DB954;
+}
+
+.spotify-player-art {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.spotify-player-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.spotify-player-track {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spotify-player-artist {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spotify-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.spotify-ctrl-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 6px;
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.spotify-ctrl-play {
+  font-size: 1.5rem;
+}
+
+.spotify-np-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
+}
+
 .spotify-list {
   display: flex;
   flex-direction: column;

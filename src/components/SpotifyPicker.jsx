@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 const CLIENT_ID = 'ea05b7bce4914f5d9b39c28eeabc9f37';
 const REDIRECT_URI = typeof window !== 'undefined' ? `${window.location.origin}/` : '';
-const SCOPES = 'user-read-playback-state user-modify-playback-state playlist-read-private';
+const SCOPES = 'streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state playlist-read-private';
 
 // PKCE helpers
 async function generateCodeVerifier() {
@@ -22,7 +22,6 @@ async function generateCodeChallenge(verifier) {
 async function exchangeCode(code) {
   const verifier = sessionStorage.getItem('spotify_code_verifier');
   if (!verifier) return null;
-
   const res = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -34,14 +33,25 @@ async function exchangeCode(code) {
       code_verifier: verifier,
     }),
   });
-
   if (!res.ok) return null;
   const data = await res.json();
   return data.access_token || null;
 }
 
-function getStoredToken() {
-  return sessionStorage.getItem('spotify_token');
+// Load the Spotify Web Playback SDK script
+function loadSpotifySDK() {
+  return new Promise((resolve) => {
+    if (window.Spotify) { resolve(); return; }
+    if (document.getElementById('spotify-sdk')) {
+      window.onSpotifyWebPlaybackSDKReady = resolve;
+      return;
+    }
+    const script = document.createElement('script');
+    script.id = 'spotify-sdk';
+    script.src = 'https://sdk.scdn.co/spotify-player.js';
+    window.onSpotifyWebPlaybackSDKReady = resolve;
+    document.body.appendChild(script);
+  });
 }
 
 export default function SpotifyPicker({ onBack }) {
@@ -50,13 +60,17 @@ export default function SpotifyPicker({ onBack }) {
   const [selected, setSelected] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [playerReady, setPlayerReady] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const playerRef = useRef(null);
+  const deviceIdRef = useRef(null);
 
+  // Init auth
   useEffect(() => {
     async function init() {
-      // Check for auth code in URL (callback from Spotify)
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
-
       if (code) {
         window.history.replaceState(null, '', window.location.pathname);
         const accessToken = await exchangeCode(code);
@@ -69,17 +83,68 @@ export default function SpotifyPicker({ onBack }) {
           return;
         }
       }
-
-      // Check for existing token
-      const stored = getStoredToken();
-      if (stored) {
-        setToken(stored);
-        fetchPlaylists(stored);
-      }
+      const stored = sessionStorage.getItem('spotify_token');
+      if (stored) { setToken(stored); fetchPlaylists(stored); }
       setLoading(false);
     }
     init();
   }, []);
+
+  // Init Web Playback SDK when we have a token
+  useEffect(() => {
+    if (!token) return;
+
+    let player;
+    async function initPlayer() {
+      await loadSpotifySDK();
+
+      player = new window.Spotify.Player({
+        name: "Nathan's Decision Maker",
+        getOAuthToken: cb => cb(token),
+        volume: 0.8,
+      });
+
+      player.addListener('ready', ({ device_id }) => {
+        deviceIdRef.current = device_id;
+        setPlayerReady(true);
+      });
+
+      player.addListener('not_ready', () => {
+        setPlayerReady(false);
+      });
+
+      player.addListener('player_state_changed', (state) => {
+        if (!state) return;
+        setIsPlaying(!state.paused);
+        const track = state.track_window?.current_track;
+        if (track) {
+          setCurrentTrack({
+            name: track.name,
+            artist: track.artists.map(a => a.name).join(', '),
+            image: track.album?.images?.[0]?.url,
+          });
+        }
+      });
+
+      player.addListener('initialization_error', ({ message }) => {
+        setError(`Player init failed: ${message}`);
+      });
+
+      player.addListener('authentication_error', () => {
+        sessionStorage.removeItem('spotify_token');
+        setToken(null);
+      });
+
+      await player.connect();
+      playerRef.current = player;
+    }
+
+    initPlayer();
+
+    return () => {
+      if (player) player.disconnect();
+    };
+  }, [token]);
 
   const fetchPlaylists = useCallback(async (accessToken) => {
     try {
@@ -87,25 +152,18 @@ export default function SpotifyPicker({ onBack }) {
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
       if (!res.ok) {
-        if (res.status === 401) {
-          sessionStorage.removeItem('spotify_token');
-          setToken(null);
-          return;
-        }
+        if (res.status === 401) { sessionStorage.removeItem('spotify_token'); setToken(null); return; }
         throw new Error(`Spotify API error ${res.status}`);
       }
       const data = await res.json();
       setPlaylists(data.items || []);
-    } catch (err) {
-      setError(`Failed to load playlists: ${err.message}`);
-    }
+    } catch (err) { setError(`Failed to load playlists: ${err.message}`); }
   }, []);
 
   async function handleLogin() {
     const verifier = await generateCodeVerifier();
     const challenge = await generateCodeChallenge(verifier);
     sessionStorage.setItem('spotify_code_verifier', verifier);
-
     const authUrl = `https://accounts.spotify.com/authorize?` +
       `client_id=${CLIENT_ID}` +
       `&response_type=code` +
@@ -113,24 +171,50 @@ export default function SpotifyPicker({ onBack }) {
       `&scope=${encodeURIComponent(SCOPES)}` +
       `&code_challenge_method=S256` +
       `&code_challenge=${challenge}`;
-
     window.location.href = authUrl;
   }
 
   async function handlePlay(playlist) {
     setSelected(playlist);
+
+    if (playerReady && deviceIdRef.current) {
+      try {
+        const res = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceIdRef.current}`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ context_uri: playlist.uri }),
+        });
+        if (res.ok) return;
+      } catch {}
+    }
+
+    // Fallback: try any active device
     try {
-      await fetch('https://api.spotify.com/v1/me/player/play', {
+      const res = await fetch('https://api.spotify.com/v1/me/player/play', {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ context_uri: playlist.uri }),
       });
-    } catch {
-      window.open(playlist.external_urls?.spotify || `https://open.spotify.com/playlist/${playlist.id}`, '_blank');
-    }
+      if (res.ok) return;
+    } catch {}
+
+    // Last resort: open in Spotify
+    window.open(playlist.external_urls?.spotify || `https://open.spotify.com/playlist/${playlist.id}`, '_blank');
+  }
+
+  async function togglePlayPause() {
+    if (!playerRef.current) return;
+    await playerRef.current.togglePlay();
+  }
+
+  async function skipNext() {
+    if (!playerRef.current) return;
+    await playerRef.current.nextTrack();
+  }
+
+  async function skipPrev() {
+    if (!playerRef.current) return;
+    await playerRef.current.previousTrack();
   }
 
   if (loading) {
@@ -149,18 +233,37 @@ export default function SpotifyPicker({ onBack }) {
       {!token ? (
         <>
           <p className="spotify-intro">Connect Spotify to pick your playlist for the day, Nathan.</p>
-          <button className="btn-spotify" onClick={handleLogin}>
-            🎵 Login to Spotify
-          </button>
+          <button className="btn-spotify" onClick={handleLogin}>🎵 Login to Spotify</button>
         </>
       ) : (
         <>
           {error && <p className="error-msg">{error}</p>}
 
-          {selected && (
+          {/* Now Playing + Controls */}
+          {currentTrack && (
+            <div className="spotify-player-card">
+              {currentTrack.image && (
+                <img src={currentTrack.image} alt="" className="spotify-player-art" />
+              )}
+              <div className="spotify-player-info">
+                <p className="spotify-player-track">{currentTrack.name}</p>
+                <p className="spotify-player-artist">{currentTrack.artist}</p>
+              </div>
+              <div className="spotify-controls">
+                <button className="spotify-ctrl-btn" onClick={skipPrev}>⏮</button>
+                <button className="spotify-ctrl-btn spotify-ctrl-play" onClick={togglePlayPause}>
+                  {isPlaying ? '⏸' : '▶️'}
+                </button>
+                <button className="spotify-ctrl-btn" onClick={skipNext}>⏭</button>
+              </div>
+            </div>
+          )}
+
+          {!currentTrack && selected && (
             <div className="spotify-now-playing">
-              <p className="spotify-np-label">Now Playing 🎶</p>
+              <p className="spotify-np-label">Selected 🎶</p>
               <p className="spotify-np-name">{selected.name}</p>
+              {!playerReady && <p className="spotify-np-hint">Requires Spotify Premium for in-app playback</p>}
             </div>
           )}
 
@@ -188,9 +291,7 @@ export default function SpotifyPicker({ onBack }) {
         </>
       )}
 
-      <button className="btn-reset" onClick={onBack}>
-        ← Back to Decision Maker
-      </button>
+      <button className="btn-reset" onClick={onBack}>← Back</button>
     </div>
   );
 }

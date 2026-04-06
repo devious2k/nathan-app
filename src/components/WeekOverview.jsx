@@ -27,19 +27,15 @@ export default function WeekOverview({ onStartSession }) {
 
   useEffect(() => {
     function load() {
-      let revision = {};
-      let driving = {};
-      let goals = [];
+      let revision = {}, driving = {}, goals = [];
       try { revision = JSON.parse(localStorage.getItem('nathan_revision_plan') || '{}'); } catch {}
       try { driving = JSON.parse(localStorage.getItem('nathan_driving_lessons') || '{}'); } catch {}
       try { goals = JSON.parse(localStorage.getItem('nathan_goals') || '[]'); } catch {}
       setData({ revision, driving, goals });
     }
     load();
-    // Refresh when tab becomes visible
-    const handleFocus = () => load();
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
+    window.addEventListener('focus', load);
+    return () => window.removeEventListener('focus', load);
   }, []);
 
   const today = new Date();
@@ -47,26 +43,39 @@ export default function WeekOverview({ onStartSession }) {
   const monday = getMonday(today);
   const weekDays = getWeekDays(monday);
 
-  const activeGoals = data.goals.filter(g => !g.completed).slice(0, 3);
+  // Only show today + days that have items (skip empty past days)
+  const visibleDays = weekDays.filter(day => {
+    const key = formatDate(day);
+    const isToday = key === todayStr;
+    const isPast = key < todayStr;
+    const revSessions = data.revision[key] || [];
+    const driveLessons = data.driving[key] || [];
+    const exams = EXAM_DATES.filter(e => e.date === key);
+    const hasItems = revSessions.length > 0 || driveLessons.length > 0 || exams.length > 0;
+    return isToday || (!isPast && hasItems);
+  });
+
+  const activeGoals = data.goals.filter(g => !g.completed).slice(0, 2);
 
   return (
     <div className="week-overview">
       <h2 className="wo-title">📅 This Week</h2>
 
       <div className="wo-days">
-        {weekDays.map(day => {
+        {visibleDays.length === 0 && (
+          <div className="wo-empty-week">Nothing scheduled this week. Enjoy the free time! 🎉</div>
+        )}
+        {visibleDays.map(day => {
           const key = formatDate(day);
           const isToday = key === todayStr;
-          const isPast = key < todayStr;
           const revSessions = data.revision[key] || [];
           const driveLessons = data.driving[key] || [];
           const exams = EXAM_DATES.filter(e => e.date === key);
-          const hasItems = revSessions.length > 0 || driveLessons.length > 0 || exams.length > 0;
 
           return (
-            <div key={key} className={`wo-day ${isToday ? 'wo-today' : ''} ${isPast ? 'wo-past' : ''}`}>
+            <div key={key} className={`wo-day ${isToday ? 'wo-today' : ''}`}>
               <div className="wo-day-head">
-                <span className="wo-day-name">{day.toLocaleDateString('en-GB', { weekday: 'short' })}</span>
+                <span className="wo-day-name">{isToday ? 'Today' : day.toLocaleDateString('en-GB', { weekday: 'short' })}</span>
                 <span className="wo-day-num">{day.getDate()}</span>
               </div>
 
@@ -75,7 +84,6 @@ export default function WeekOverview({ onStartSession }) {
                   const sub = SUBJECTS.find(s => s.id === exam.subject);
                   return (
                     <div key={`exam-${i}`} className="wo-item wo-exam" style={{ background: sub?.colour, color: '#1a1a2e' }}>
-                      <span className="wo-item-icon">🎓</span>
                       <span className="wo-item-text">{exam.paper.split(' ').slice(1).join(' ')}</span>
                       <span className="wo-item-time">{exam.time}</span>
                     </div>
@@ -84,7 +92,7 @@ export default function WeekOverview({ onStartSession }) {
 
                 {revSessions.map(session => {
                   const sub = SUBJECTS.find(s => s.id === session.subject);
-                  const clickable = !isPast && onStartSession;
+                  const clickable = onStartSession;
                   return (
                     <div
                       key={`rev-${session.id}`}
@@ -92,8 +100,7 @@ export default function WeekOverview({ onStartSession }) {
                       style={{ borderLeftColor: sub?.colour }}
                       onClick={clickable ? () => onStartSession(session) : undefined}
                     >
-                      <span className="wo-item-icon">{sub?.icon}</span>
-                      <span className="wo-item-text">{session.topic}</span>
+                      <span className="wo-item-text">{sub?.icon} {session.topic}</span>
                       <span className="wo-item-time">{clickable ? '▶' : session.time}</span>
                     </div>
                   );
@@ -101,14 +108,13 @@ export default function WeekOverview({ onStartSession }) {
 
                 {driveLessons.map(lesson => (
                   <div key={`drive-${lesson.id}`} className="wo-item wo-driving">
-                    <span className="wo-item-icon">🚗</span>
-                    <span className="wo-item-text">{lesson.note || 'Driving lesson'}</span>
+                    <span className="wo-item-text">🚗 {lesson.note || 'Driving lesson'}</span>
                     <span className="wo-item-time">{lesson.time}</span>
                   </div>
                 ))}
 
-                {!hasItems && !isPast && (
-                  <div className="wo-empty">Free</div>
+                {isToday && exams.length === 0 && revSessions.length === 0 && driveLessons.length === 0 && (
+                  <div className="wo-empty">Nothing today — relax or revise 😎</div>
                 )}
               </div>
             </div>
@@ -116,19 +122,13 @@ export default function WeekOverview({ onStartSession }) {
         })}
       </div>
 
-      {/* Active goals */}
       {activeGoals.length > 0 && (
         <div className="wo-goals">
-          <p className="wo-goals-title">🎯 Current Goals</p>
+          <p className="wo-goals-title">🎯 Goals</p>
           {activeGoals.map(goal => (
             <div key={goal.id} className="wo-goal">
               <span className="wo-goal-dot">○</span>
               <span className="wo-goal-text">{goal.title}</span>
-              {goal.deadline && (
-                <span className="wo-goal-date">
-                  {new Date(goal.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                </span>
-              )}
             </div>
           ))}
         </div>

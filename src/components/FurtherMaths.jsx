@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { jsPDF } from 'jspdf';
 
 const STEPS = { LOADING: 'loading', PROBLEMS: 'problems', MARKING: 'marking', RESULTS: 'results' };
 
@@ -76,6 +77,83 @@ export default function FurtherMaths({ onBack }) {
       ...prev,
       [id]: { ...prev[id], [field]: value },
     }));
+  }
+
+  async function downloadCertificate() {
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const w = doc.internal.pageSize.getWidth();
+    const h = doc.internal.pageSize.getHeight();
+
+    // Background
+    doc.setFillColor(15, 15, 35);
+    doc.rect(0, 0, w, h, 'F');
+
+    // Gold border
+    doc.setDrawColor(255, 230, 109);
+    doc.setLineWidth(3);
+    doc.rect(10, 10, w - 20, h - 20);
+    doc.setLineWidth(1);
+    doc.rect(14, 14, w - 28, h - 28);
+
+    // Title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(42);
+    doc.setTextColor(255, 230, 109);
+    doc.text('CERTIFICATE OF ACHIEVEMENT', w / 2, 45, { align: 'center' });
+
+    // Smiley
+    doc.setFontSize(36);
+    doc.text('😊', w / 2, 62, { align: 'center' });
+
+    // Well done
+    doc.setFontSize(28);
+    doc.setTextColor(78, 205, 196);
+    doc.text('Well Done Nathan!', w / 2, 80, { align: 'center' });
+
+    // Score
+    doc.setFontSize(20);
+    doc.setTextColor(230, 230, 240);
+    doc.text(
+      `You scored ${results.totalMarks} out of ${results.totalAvailable} marks`,
+      w / 2, 95, { align: 'center' }
+    );
+
+    doc.setFontSize(16);
+    doc.setTextColor(170, 150, 218);
+    doc.text('Further Mathematics A-Level Practice', w / 2, 108, { align: 'center' });
+
+    // Load and add Nathan's photo
+    try {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = '/nathan.png';
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const imgData = canvas.toDataURL('image/jpeg', 0.8);
+
+      const imgH = 65;
+      const imgW = imgH * (img.width / img.height);
+      doc.addImage(imgData, 'JPEG', (w - imgW) / 2, 115, imgW, imgH);
+    } catch {
+      // If image fails, just skip it
+    }
+
+    // Footer
+    doc.setFontSize(11);
+    doc.setTextColor(152, 152, 176);
+    const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    doc.text(today, w / 2, h - 22, { align: 'center' });
+    doc.text("Nathan's Decision Maker — gameonsolutions.uk", w / 2, h - 28, { align: 'center' });
+
+    doc.save('nathan-certificate.pdf');
   }
 
   return (
@@ -202,6 +280,10 @@ export default function FurtherMaths({ onBack }) {
               </div>
             </div>
           ))}
+
+          <button className="btn-certificate" onClick={downloadCertificate}>
+            Download Certificate 🏆
+          </button>
 
           <button className="btn-primary" onClick={() => { setResults(null); generateProblems(); }}>
             Try New Problems 🔄

@@ -97,70 +97,10 @@ export default function App() {
         )}
 
         {/* ═══ HOME TAB ═══ */}
-        {!activeWorksheet && tab === 'home' && !mode && (
+        {!activeWorksheet && tab === 'home' && (
           <>
             <NowPlaying />
             <WeekOverview onStartSession={startSession} />
-
-            {step === STEPS.INPUT && (
-              <div className="card">
-                <span className="badge">⏳ Stop. Overthinking. Now.</span>
-
-                <label className="field-label" htmlFor="interests">What are you into today?</label>
-                <textarea
-                  id="interests" className="field-textarea" rows={3}
-                  placeholder="e.g. gaming, going out, food, music, chilling..."
-                  value={interests} onChange={(e) => setInterests(e.target.value)}
-                />
-
-                <label className="field-label" htmlFor="goals">What do you actually want to achieve?</label>
-                <textarea
-                  id="goals" className="field-textarea" rows={3}
-                  placeholder="e.g. be productive, have fun, get some fresh air, eat something good..."
-                  value={goals} onChange={(e) => setGoals(e.target.value)}
-                />
-
-                {error && <p className="error-msg">{error}</p>}
-
-                <button className="btn-primary" onClick={handleGenerate}>
-                  Sort My Day Out 🚀
-                </button>
-              </div>
-            )}
-
-            {step === STEPS.LOADING && (
-              <div className="card card-center">
-                <div className="spinner" />
-                <p className="loading-title">Figuring out your life...</p>
-                <p className="loading-sub">(This still took less time than Nathan deciding what to eat 😂)</p>
-              </div>
-            )}
-
-            {step === STEPS.RESULTS && (
-              <div className="card">
-                <div className="plan-box">
-                  <p className="plan-title">📋 Your Day Plan</p>
-                  <p className="plan-text">{plan}</p>
-                </div>
-                <div className="wheel-section">
-                  <div className="wheel-header">
-                    <span className="badge">🎡 The Wheel of Fate</span>
-                    <p className="wheel-sub">Spin it. Do what it says. No backsies.</p>
-                  </div>
-                  <SpinWheel options={wheelOptions} spinning={spinning} onSpinEnd={handleSpinEnd} />
-                  <button className="btn-spin" onClick={handleSpin} disabled={spinning}>
-                    {spinning ? 'Spinning... 🌀' : 'SPIN THE WHEEL 🎯'}
-                  </button>
-                  {winner && (
-                    <div className="winner-box">
-                      <p className="winner-title">The Wheel Has Spoken! 🎉</p>
-                      <p className="winner-text">{winner}</p>
-                    </div>
-                  )}
-                  <button className="btn-reset" onClick={handleReset}>← Start Over (yes, again)</button>
-                </div>
-              </div>
-            )}
           </>
         )}
 
@@ -240,6 +180,11 @@ export default function App() {
             <h2 className="tab-menu-title">🍽️ Life</h2>
             <p className="tab-menu-sub">The boring bits, sorted.</p>
             <div className="tab-menu-grid">
+              <button className="tab-menu-item tab-menu-featured" onClick={() => setMode('sortmyday')}>
+                <span className="tab-menu-icon">🎲</span>
+                <span className="tab-menu-label">Sort My Day Out</span>
+                <span className="tab-menu-desc">AI plan + Wheel of Fate</span>
+              </button>
               <button className="tab-menu-item" onClick={() => setMode('activities')}>
                 <span className="tab-menu-icon">🎯</span>
                 <span className="tab-menu-label">Things To Do</span>
@@ -267,6 +212,62 @@ export default function App() {
               </button>
             </div>
           </div>
+        )}
+        {tab === 'life' && mode === 'sortmyday' && (
+          <>
+            {step === STEPS.INPUT && (
+              <div className="card">
+                <span className="badge">⏳ Stop. Overthinking. Now.</span>
+                <label className="field-label" htmlFor="interests-life">What are you into today?</label>
+                <textarea
+                  id="interests-life" className="field-textarea" rows={3}
+                  placeholder="e.g. gaming, going out, food, music, chilling..."
+                  value={interests} onChange={(e) => setInterests(e.target.value)}
+                />
+                <label className="field-label" htmlFor="goals-life">What do you actually want to achieve?</label>
+                <textarea
+                  id="goals-life" className="field-textarea" rows={3}
+                  placeholder="e.g. be productive, have fun, get some fresh air, eat something good..."
+                  value={goals} onChange={(e) => setGoals(e.target.value)}
+                />
+                {error && <p className="error-msg">{error}</p>}
+                <button className="btn-primary" onClick={handleGenerate}>Sort My Day Out 🚀</button>
+                <button className="btn-reset" onClick={() => setMode(null)}>← Back</button>
+              </div>
+            )}
+            {step === STEPS.LOADING && (
+              <div className="card card-center">
+                <div className="spinner" />
+                <p className="loading-title">Figuring out your life...</p>
+                <p className="loading-sub">(This still took less time than Nathan deciding what to eat 😂)</p>
+              </div>
+            )}
+            {step === STEPS.RESULTS && (
+              <div className="card">
+                <div className="plan-box">
+                  <p className="plan-title">📋 Your Day Plan</p>
+                  <p className="plan-text">{plan}</p>
+                </div>
+                <div className="wheel-section">
+                  <div className="wheel-header">
+                    <span className="badge">🎡 The Wheel of Fate</span>
+                    <p className="wheel-sub">Spin it. Do what it says. No backsies.</p>
+                  </div>
+                  <SpinWheel options={wheelOptions} spinning={spinning} onSpinEnd={handleSpinEnd} />
+                  <button className="btn-spin" onClick={handleSpin} disabled={spinning}>
+                    {spinning ? 'Spinning... 🌀' : 'SPIN THE WHEEL 🎯'}
+                  </button>
+                  {winner && (
+                    <div className="winner-box">
+                      <p className="winner-title">The Wheel Has Spoken! 🎉</p>
+                      <p className="winner-text">{winner}</p>
+                    </div>
+                  )}
+                  <button className="btn-reset" onClick={() => { handleReset(); setMode(null); }}>← Back</button>
+                </div>
+              </div>
+            )}
+          </>
         )}
         {tab === 'life' && mode === 'activities' && <Activities onBack={() => setMode(null)} />}
         {tab === 'life' && mode === 'goals' && <Goals onBack={() => setMode(null)} />}

@@ -1,0 +1,348 @@
+/* ─── Reset & Base ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0f0f23;
+  --surface: #1a1a2e;
+  --surface-light: #25253e;
+  --accent: #FFE66D;
+  --accent-2: #4ECDC4;
+  --text: #e8e8f0;
+  --text-muted: #9898b0;
+  --danger: #FF6B6B;
+  --radius: 16px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Space Grotesk', 'Inter', sans-serif;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── App Layout ─── */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.app-title {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 4px;
+}
+
+.app-main {
+  flex: 1;
+}
+
+/* ─── Card ─── */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.card-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  gap: 12px;
+}
+
+/* ─── Badge ─── */
+.badge {
+  display: inline-block;
+  background: var(--surface-light);
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Form Fields ─── */
+.field-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.field-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  resize: vertical;
+  margin-bottom: 18px;
+  transition: border-color 0.2s;
+}
+
+.field-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.field-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* ─── Buttons ─── */
+.btn-primary {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--accent), #f0d04a);
+  color: var(--surface);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(255, 230, 109, 0.25);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-spin {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin-top: 16px;
+  background: linear-gradient(135deg, var(--accent-2), #3bb5a8);
+  color: var(--surface);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btn-spin:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(78, 205, 196, 0.3);
+}
+
+.btn-spin:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-reset {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.btn-reset:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ─── Error ─── */
+.error-msg {
+  color: var(--danger);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* ─── Loading Spinner ─── */
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-title {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.loading-sub {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ─── Plan Box ─── */
+.plan-box {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 24px;
+  border-left: 4px solid var(--accent);
+}
+
+.plan-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 8px;
+  color: var(--accent);
+}
+
+.plan-text {
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+/* ─── Wheel Section ─── */
+.wheel-section {
+  text-align: center;
+}
+
+.wheel-header {
+  margin-bottom: 16px;
+}
+
+.wheel-sub {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.wheel-container {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.wheel-canvas {
+  max-width: 100%;
+  border-radius: 50%;
+}
+
+/* ─── Winner Box ─── */
+.winner-box {
+  margin-top: 18px;
+  padding: 18px;
+  background: var(--bg);
+  border-radius: 12px;
+  border: 2px solid var(--accent);
+  animation: pop-in 0.3s ease-out;
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.winner-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.winner-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ─── Footer ─── */
+.app-footer {
+  text-align: center;
+  padding: 24px 0 8px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.app-footer a {
+  color: var(--accent-2);
+  text-decoration: none;
+}
+
+.app-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  .app {
+    padding: 16px 12px;
+  }
+
+  .app-title {
+    font-size: 1.6rem;
+  }
+
+  .card {
+    padding: 20px 16px;
+  }
+}

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nathan-v15';
+const CACHE_NAME = 'nathan-v16';
 const PRECACHE = ['/', '/manifest.json', '/favicon.svg', '/icon-192.png', '/icon-512.png', '/marcel.png'];
 
 self.addEventListener('install', (e) => {

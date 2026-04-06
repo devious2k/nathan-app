@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { EXAM_DATES, SUBJECTS } from './RevisionCalendar.jsx';
+import { addToCalendar } from '../utils/calendar.js';
 
 function getMonday(date) {
   const d = new Date(date);
@@ -85,7 +86,7 @@ export default function WeekOverview({ onStartSession }) {
                   return (
                     <div key={`exam-${i}`} className="wo-item wo-exam" style={{ background: sub?.colour, color: '#1a1a2e' }}>
                       <span className="wo-item-text">{exam.paper.split(' ').slice(1).join(' ')}</span>
-                      <span className="wo-item-time">{exam.time}</span>
+                      <button className="wo-cal-btn wo-cal-dark" onClick={(e) => { e.stopPropagation(); addToCalendar({ title: `EXAM: ${exam.paper}`, description: `${sub?.name} A-Level Exam`, date: key, time: exam.time, durationMins: 150 }); }}>📅</button>
                     </div>
                   );
                 })}
@@ -101,7 +102,7 @@ export default function WeekOverview({ onStartSession }) {
                       onClick={clickable ? () => onStartSession(session) : undefined}
                     >
                       <span className="wo-item-text">{sub?.icon} {session.topic}</span>
-                      <span className="wo-item-time">{clickable ? '▶' : session.time}</span>
+                      <button className="wo-cal-btn" onClick={(e) => { e.stopPropagation(); addToCalendar({ title: `Revision: ${session.topic}`, description: `${sub?.name} revision session`, date: key, time: session.time, durationMins: 90 }); }}>📅</button>
                     </div>
                   );
                 })}
@@ -109,7 +110,7 @@ export default function WeekOverview({ onStartSession }) {
                 {driveLessons.map(lesson => (
                   <div key={`drive-${lesson.id}`} className="wo-item wo-driving">
                     <span className="wo-item-text">🚗 {lesson.note || 'Driving lesson'}</span>
-                    <span className="wo-item-time">{lesson.time}</span>
+                    <button className="wo-cal-btn" onClick={(e) => { e.stopPropagation(); addToCalendar({ title: 'Driving Lesson', description: lesson.note || 'Driving lesson', date: key, time: lesson.time, durationMins: 60 }); }}>📅</button>
                   </div>
                 ))}
 

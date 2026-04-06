@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { addToCalendar } from '../utils/calendar.js';
 
 const STORAGE_KEY = 'nathan_revision_plan';
 
@@ -260,7 +261,8 @@ export default function RevisionCalendar({ onBack, onStartSession }) {
                 const sub = SUBJECTS.find(s => s.id === exam.subject);
                 return (
                   <div key={i} className="rev-exam-badge" style={{ background: sub?.colour, color: '#1a1a2e' }}>
-                    🎓 {exam.paper}
+                    <span>🎓 {exam.paper}</span>
+                    <button className="wo-cal-btn wo-cal-dark" onClick={() => addToCalendar({ title: `EXAM: ${exam.paper}`, description: `${sub?.name} A-Level Exam`, date: key, time: exam.time, durationMins: 150 })}>📅</button>
                   </div>
                 );
               })}
@@ -277,6 +279,7 @@ export default function RevisionCalendar({ onBack, onStartSession }) {
                   >
                     <div className="rev-session-top">
                       <span className="rev-session-time">{canStart ? '▶ Start' : session.time}</span>
+                      <button className="wo-cal-btn" onClick={(e) => { e.stopPropagation(); addToCalendar({ title: `Revision: ${session.topic}`, description: `${SUBJECTS.find(s => s.id === session.subject)?.name} revision`, date: key, time: session.time, durationMins: 90 }); }}>📅</button>
                       <button className="cal-lesson-delete" onClick={(e) => { e.stopPropagation(); deleteSession(key, session.id); }}>×</button>
                     </div>
                     <span className="rev-session-subject" style={{ color: sub?.colour }}>

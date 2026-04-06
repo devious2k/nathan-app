@@ -1653,12 +1653,14 @@ body {
 }
 
 .rev-exam-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: 0.75rem;
   font-weight: 800;
   padding: 6px 10px;
   border-radius: 8px;
   margin-bottom: 6px;
-  text-align: center;
 }
 
 .rev-session {
@@ -2033,6 +2035,25 @@ body {
   color: var(--text-muted);
   font-weight: 700;
   flex-shrink: 0;
+}
+
+.wo-cal-btn {
+  background: none;
+  border: none;
+  font-size: 0.7rem;
+  cursor: pointer;
+  padding: 2px 4px;
+  flex-shrink: 0;
+  opacity: 0.6;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wo-cal-btn:hover {
+  opacity: 1;
+}
+
+.wo-cal-dark {
+  opacity: 0.8;
 }
 
 .wo-empty {

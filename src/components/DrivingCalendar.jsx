@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { addToCalendar } from '../utils/calendar.js';
 
 const STORAGE_KEY = 'nathan_driving_lessons';
 
@@ -112,6 +113,11 @@ export default function DrivingCalendar({ onBack }) {
                 <div key={lesson.id} className="cal-lesson">
                   <span className="cal-lesson-time">🚗 {lesson.time}</span>
                   {lesson.note && <span className="cal-lesson-note">{lesson.note}</span>}
+                  <button
+                    className="wo-cal-btn"
+                    onClick={() => addToCalendar({ title: 'Driving Lesson', description: lesson.note || 'Driving lesson', date: key, time: lesson.time, durationMins: 60 })}
+                    title="Add to Calendar"
+                  >📅</button>
                   <button
                     className="cal-lesson-delete"
                     onClick={() => deleteLesson(key, lesson.id)}

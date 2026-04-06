@@ -80,18 +80,18 @@ function getNotifications() {
   return notifications.sort((a, b) => b.priority - a.priority);
 }
 
-// Schedule browser notifications for upcoming events
-function scheduleBrowserNotifications(notifications) {
+// Schedule notifications via the service worker (works in background on Android)
+async function scheduleBrowserNotifications(notifications) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (!('serviceWorker' in navigator)) return;
 
+  const reg = await navigator.serviceWorker.ready;
   const now = new Date();
-  const today = formatDate(now);
   const scheduled = JSON.parse(sessionStorage.getItem('nathan_scheduled_notifs') || '[]');
 
   notifications.forEach(n => {
     if (scheduled.includes(n.id)) return;
 
-    // Calculate time until event
     const [hours, mins] = (n.time || '').split(':').map(Number);
     if (isNaN(hours)) return;
 
@@ -102,16 +102,15 @@ function scheduleBrowserNotifications(notifications) {
     const notifyTime = new Date(eventTime.getTime() - 15 * 60 * 1000);
     const delay = notifyTime.getTime() - now.getTime();
 
-    if (delay > 0 && delay < 12 * 60 * 60 * 1000) { // Within next 12 hours
-      setTimeout(() => {
-        new Notification(n.title, {
-          body: n.body,
-          icon: '/icon-192.png',
-          tag: n.id,
-          requireInteraction: true,
-        });
-      }, delay);
-
+    if (delay > 0 && delay < 12 * 60 * 60 * 1000) {
+      // Send to service worker so it fires even if tab is backgrounded
+      reg.active?.postMessage({
+        type: 'SCHEDULE_NOTIFICATION',
+        title: n.title,
+        body: n.body,
+        tag: n.id,
+        delay,
+      });
       scheduled.push(n.id);
     }
   });

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'nathan-v14';
-const PRECACHE = ['/', '/manifest.json', '/favicon.svg', '/icon-192.png', '/icon-512.png'];
+const CACHE_NAME = 'nathan-v15';
+const PRECACHE = ['/', '/manifest.json', '/favicon.svg', '/icon-192.png', '/icon-512.png', '/marcel.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -20,7 +20,7 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
 
-  // Don't cache API calls or Spotify/Groq requests
+  // Don't cache API calls or external requests
   if (url.pathname.startsWith('/api/') || url.hostname !== self.location.hostname) {
     return;
   }
@@ -36,6 +36,40 @@ self.addEventListener('fetch', (e) => {
       }).catch(() => cached);
 
       return cached || fetched;
+    })
+  );
+});
+
+// Handle notification messages from the main thread
+self.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'SCHEDULE_NOTIFICATION') {
+    const { title, body, tag, delay } = e.data;
+    if (delay > 0) {
+      setTimeout(() => {
+        self.registration.showNotification(title, {
+          body,
+          icon: '/icon-192.png',
+          badge: '/icon-192.png',
+          tag,
+          requireInteraction: true,
+          vibrate: [200, 100, 200],
+        });
+      }, delay);
+    }
+  }
+});
+
+// Handle notification clicks — open the app
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  e.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      return clients.openWindow('/');
     })
   );
 });

@@ -4,16 +4,44 @@ const CLIENT_ID = 'ea05b7bce4914f5d9b39c28eeabc9f37';
 const REDIRECT_URI = typeof window !== 'undefined' ? `${window.location.origin}/` : '';
 const SCOPES = 'user-read-playback-state user-modify-playback-state playlist-read-private';
 
-function getTokenFromHash() {
-  if (typeof window === 'undefined') return null;
-  const hash = window.location.hash.substring(1);
-  const params = new URLSearchParams(hash);
-  const token = params.get('access_token');
-  if (token) {
-    sessionStorage.setItem('spotify_token', token);
-    window.history.replaceState(null, '', window.location.pathname);
-  }
-  return token || sessionStorage.getItem('spotify_token');
+// PKCE helpers
+async function generateCodeVerifier() {
+  const array = new Uint8Array(64);
+  crypto.getRandomValues(array);
+  return btoa(String.fromCharCode(...array))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function generateCodeChallenge(verifier) {
+  const data = new TextEncoder().encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function exchangeCode(code) {
+  const verifier = sessionStorage.getItem('spotify_code_verifier');
+  if (!verifier) return null;
+
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: CLIENT_ID,
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: REDIRECT_URI,
+      code_verifier: verifier,
+    }),
+  });
+
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.access_token || null;
+}
+
+function getStoredToken() {
+  return sessionStorage.getItem('spotify_token');
 }
 
 export default function SpotifyPicker({ onBack }) {
@@ -21,13 +49,36 @@ export default function SpotifyPicker({ onBack }) {
   const [playlists, setPlaylists] = useState([]);
   const [selected, setSelected] = useState(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const t = getTokenFromHash();
-    if (t) {
-      setToken(t);
-      fetchPlaylists(t);
+    async function init() {
+      // Check for auth code in URL (callback from Spotify)
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+
+      if (code) {
+        window.history.replaceState(null, '', window.location.pathname);
+        const accessToken = await exchangeCode(code);
+        if (accessToken) {
+          sessionStorage.setItem('spotify_token', accessToken);
+          sessionStorage.removeItem('spotify_code_verifier');
+          setToken(accessToken);
+          fetchPlaylists(accessToken);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Check for existing token
+      const stored = getStoredToken();
+      if (stored) {
+        setToken(stored);
+        fetchPlaylists(stored);
+      }
+      setLoading(false);
     }
+    init();
   }, []);
 
   const fetchPlaylists = useCallback(async (accessToken) => {
@@ -50,8 +101,19 @@ export default function SpotifyPicker({ onBack }) {
     }
   }, []);
 
-  function handleLogin() {
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
+  async function handleLogin() {
+    const verifier = await generateCodeVerifier();
+    const challenge = await generateCodeChallenge(verifier);
+    sessionStorage.setItem('spotify_code_verifier', verifier);
+
+    const authUrl = `https://accounts.spotify.com/authorize?` +
+      `client_id=${CLIENT_ID}` +
+      `&response_type=code` +
+      `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+      `&scope=${encodeURIComponent(SCOPES)}` +
+      `&code_challenge_method=S256` +
+      `&code_challenge=${challenge}`;
+
     window.location.href = authUrl;
   }
 
@@ -67,9 +129,17 @@ export default function SpotifyPicker({ onBack }) {
         body: JSON.stringify({ context_uri: playlist.uri }),
       });
     } catch {
-      // Player may not be active — open in Spotify instead
       window.open(playlist.external_urls?.spotify || `https://open.spotify.com/playlist/${playlist.id}`, '_blank');
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="card card-center">
+        <div className="spinner" />
+        <p className="loading-title">Connecting to Spotify...</p>
+      </div>
+    );
   }
 
   return (

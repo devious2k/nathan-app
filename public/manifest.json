@@ -1,0 +1,15 @@
+{
+  "name": "Nathan's Decision Maker",
+  "short_name": "Nathan",
+  "description": "AI-powered decision maker, revision, and life planner for Nathan",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f23",
+  "theme_color": "#0f0f23",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" },
+    { "src": "/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml" },
+    { "src": "/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

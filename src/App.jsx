@@ -9,6 +9,8 @@ import LunchPlanner from './components/LunchPlanner.jsx';
 import DrivingCalendar from './components/DrivingCalendar.jsx';
 import RevisionCalendar from './components/RevisionCalendar.jsx';
 import Notifications from './components/Notifications.jsx';
+import WeekOverview from './components/WeekOverview.jsx';
+import NowPlaying from './components/NowPlaying.jsx';
 import Activities from './components/Activities.jsx';
 import JobSearch from './components/JobSearch.jsx';
 import Goals from './components/Goals.jsx';
@@ -85,6 +87,9 @@ export default function App() {
         {/* ═══ HOME TAB ═══ */}
         {tab === 'home' && !mode && (
           <>
+            <NowPlaying />
+            <WeekOverview />
+
             {step === STEPS.INPUT && (
               <div className="card">
                 <span className="badge">⏳ Stop. Overthinking. Now.</span>

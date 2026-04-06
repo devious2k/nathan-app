@@ -118,11 +118,18 @@ export default function SpotifyPicker({ onBack }) {
         setIsPlaying(!state.paused);
         const track = state.track_window?.current_track;
         if (track) {
-          setCurrentTrack({
+          const trackData = {
             name: track.name,
             artist: track.artists.map(a => a.name).join(', '),
             image: track.album?.images?.[0]?.url,
-          });
+          };
+          setCurrentTrack(trackData);
+          // Share with NowPlaying widget on home screen
+          if (!state.paused) {
+            sessionStorage.setItem('nathan_now_playing', JSON.stringify(trackData));
+          } else {
+            sessionStorage.removeItem('nathan_now_playing');
+          }
         }
       });
 

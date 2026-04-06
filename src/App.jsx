@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import SpinWheel from './components/SpinWheel.jsx';
+import FurtherMaths from './components/FurtherMaths.jsx';
 
 // This option is ALWAYS first on the wheel — non-negotiable
 const MANDATORY_FIRST = "Check Jamie has Coca Cola and go to Simon's 🥤";
@@ -8,6 +9,7 @@ const STEPS = { INPUT: 'input', LOADING: 'loading', RESULTS: 'results' };
 
 export default function App() {
   const [step, setStep] = useState(STEPS.INPUT);
+  const [mode, setMode] = useState('decision'); // 'decision' or 'maths'
   const [interests, setInterests] = useState('');
   const [goals, setGoals] = useState('');
   const [plan, setPlan] = useState('');
@@ -76,8 +78,13 @@ export default function App() {
 
       <main className="app-main">
 
+        {/* ─── FURTHER MATHS MODE ─── */}
+        {mode === 'maths' && (
+          <FurtherMaths onBack={() => setMode('decision')} />
+        )}
+
         {/* ─── INPUT STEP ─── */}
-        {step === STEPS.INPUT && (
+        {mode === 'decision' && step === STEPS.INPUT && (
           <div className="card">
             <span className="badge">⏳ Stop. Overthinking. Now.</span>
 
@@ -110,11 +117,19 @@ export default function App() {
             <button className="btn-primary" onClick={handleGenerate}>
               Sort My Day Out 🚀
             </button>
+
+            <div className="divider">
+              <span className="divider-text">or</span>
+            </div>
+
+            <button className="btn-maths" onClick={() => setMode('maths')}>
+              📐 Further Maths Practice
+            </button>
           </div>
         )}
 
         {/* ─── LOADING STEP ─── */}
-        {step === STEPS.LOADING && (
+        {mode === 'decision' && step === STEPS.LOADING && (
           <div className="card card-center">
             <div className="spinner" />
             <p className="loading-title">Figuring out your life...</p>
@@ -125,7 +140,7 @@ export default function App() {
         )}
 
         {/* ─── RESULTS STEP ─── */}
-        {step === STEPS.RESULTS && (
+        {mode === 'decision' && step === STEPS.RESULTS && (
           <div className="card">
             {/* Day plan */}
             <div className="plan-box">

@@ -3,6 +3,10 @@ import SpinWheel from './components/SpinWheel.jsx';
 import FurtherMaths from './components/FurtherMaths.jsx';
 import Apprenticeships from './components/Apprenticeships.jsx';
 import CVGenerator from './components/CVGenerator.jsx';
+import Dashboard from './components/Dashboard.jsx';
+import SpotifyPicker from './components/SpotifyPicker.jsx';
+import LunchPlanner from './components/LunchPlanner.jsx';
+import DrivingCalendar from './components/DrivingCalendar.jsx';
 
 // This option is ALWAYS first on the wheel — non-negotiable
 const MANDATORY_FIRST = "Check Jamie has Coca Cola and go to Simon's 🥤";
@@ -11,7 +15,7 @@ const STEPS = { INPUT: 'input', LOADING: 'loading', RESULTS: 'results' };
 
 export default function App() {
   const [step, setStep] = useState(STEPS.INPUT);
-  const [mode, setMode] = useState('decision'); // 'decision' or 'study'
+  const [mode, setMode] = useState('decision');
   const [subject, setSubject] = useState(null);
   const [interests, setInterests] = useState('');
   const [goals, setGoals] = useState('');
@@ -20,6 +24,8 @@ export default function App() {
   const [spinning, setSpinning] = useState(false);
   const [winner, setWinner] = useState(null);
   const [error, setError] = useState('');
+
+  const goHome = () => { setMode('decision'); setSubject(null); };
 
   const handleGenerate = async () => {
     if (!interests.trim() && !goals.trim()) {
@@ -75,7 +81,9 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1 className="app-title">🎲 Nathan's Decision Maker</h1>
+        <h1 className="app-title" onClick={goHome} style={{ cursor: 'pointer' }}>
+          🎲 Nathan's Decision Maker
+        </h1>
         <p className="app-subtitle">Because Nathan will NEVER decide on his own 😂</p>
       </header>
 
@@ -83,21 +91,37 @@ export default function App() {
 
         {/* ─── STUDY MODE ─── */}
         {mode === 'study' && (
-          <FurtherMaths
-            key={subject}
-            subject={subject}
-            onBack={() => { setMode('decision'); setSubject(null); }}
-          />
+          <FurtherMaths key={subject} subject={subject} onBack={goHome} />
         )}
 
-        {/* ─── APPRENTICESHIPS MODE ─── */}
+        {/* ─── APPRENTICESHIPS ─── */}
         {mode === 'apprenticeships' && (
-          <Apprenticeships onBack={() => setMode('decision')} />
+          <Apprenticeships onBack={goHome} />
         )}
 
-        {/* ─── CV GENERATOR MODE ─── */}
+        {/* ─── CV GENERATOR ─── */}
         {mode === 'cv' && (
-          <CVGenerator onBack={() => setMode('decision')} />
+          <CVGenerator onBack={goHome} />
+        )}
+
+        {/* ─── DASHBOARD ─── */}
+        {mode === 'dashboard' && (
+          <Dashboard onBack={goHome} />
+        )}
+
+        {/* ─── SPOTIFY ─── */}
+        {mode === 'spotify' && (
+          <SpotifyPicker onBack={goHome} />
+        )}
+
+        {/* ─── LUNCH PLANNER ─── */}
+        {mode === 'lunch' && (
+          <LunchPlanner onBack={goHome} />
+        )}
+
+        {/* ─── DRIVING CALENDAR ─── */}
+        {mode === 'driving' && (
+          <DrivingCalendar onBack={goHome} />
         )}
 
         {/* ─── INPUT STEP ─── */}
@@ -143,7 +167,7 @@ export default function App() {
               <button className="btn-subject btn-further-maths" onClick={() => { setSubject('further-maths'); setMode('study'); }}>
                 📐 Further Maths
               </button>
-              <button className="btn-subject btn-maths" onClick={() => { setSubject('maths'); setMode('study'); }}>
+              <button className="btn-subject btn-maths-subject" onClick={() => { setSubject('maths'); setMode('study'); }}>
                 📊 Maths
               </button>
               <button className="btn-subject btn-physics" onClick={() => { setSubject('physics'); setMode('study'); }}>
@@ -159,8 +183,27 @@ export default function App() {
               <button className="btn-career btn-apprenticeships" onClick={() => setMode('apprenticeships')}>
                 💼 Find Apprenticeships
               </button>
-              <button className="btn-career btn-cv" onClick={() => setMode('cv')}>
+              <button className="btn-career btn-cv-btn" onClick={() => setMode('cv')}>
                 📝 CV Generator
+              </button>
+            </div>
+
+            <div className="divider">
+              <span className="divider-text">or sort your life</span>
+            </div>
+
+            <div className="life-buttons">
+              <button className="btn-life btn-lunch" onClick={() => setMode('lunch')}>
+                🥪 Lunch Planner
+              </button>
+              <button className="btn-life btn-driving" onClick={() => setMode('driving')}>
+                🚗 Driving Lessons
+              </button>
+              <button className="btn-life btn-spotify-btn" onClick={() => setMode('spotify')}>
+                🎵 Spotify
+              </button>
+              <button className="btn-life btn-dashboard" onClick={() => setMode('dashboard')}>
+                📊 Dashboard
               </button>
             </div>
           </div>

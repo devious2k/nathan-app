@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { incrementStat } from './Dashboard.jsx';
 
 const LEVEL_COLOURS = { 4: '#AA96DA', 5: '#4ECDC4', 6: '#FFE66D' };
 
@@ -27,6 +28,7 @@ export default function Apprenticeships({ onBack }) {
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setResults(data);
       setStep('results');
+      incrementStat('apprenticeshipsFound', data.apprenticeships?.length || 0);
     } catch (err) {
       setError(`Search failed: ${err.message}`);
       setStep('input');

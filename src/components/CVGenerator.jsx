@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { jsPDF } from 'jspdf';
+import { incrementStat } from './Dashboard.jsx';
 
 const QUESTIONS = [
   { key: 'fullName', label: 'Full name', placeholder: 'Nathan...', type: 'input' },
@@ -76,6 +77,7 @@ export default function CVGenerator({ onBack }) {
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setLetterData(data);
       setStep('letter');
+      incrementStat('coverLettersWritten');
     } catch (err) {
       setError(`Failed to generate letter: ${err.message}`);
       setStep('letter-input');

@@ -387,11 +387,11 @@ body {
   box-shadow: 0 6px 24px rgba(170, 150, 218, 0.3);
 }
 
-.btn-maths {
+.btn-maths-subject {
   background: linear-gradient(135deg, var(--accent), #d4b83d);
 }
 
-.btn-maths:hover {
+.btn-maths-subject:hover {
   box-shadow: 0 6px 24px rgba(255, 230, 109, 0.3);
 }
 
@@ -663,11 +663,11 @@ body {
   box-shadow: 0 6px 24px rgba(255, 107, 107, 0.3);
 }
 
-.btn-cv {
+.btn-cv-btn {
   background: linear-gradient(135deg, #95E1D3, #6bc4b4);
 }
 
-.btn-cv:hover {
+.btn-cv-btn:hover {
   box-shadow: 0 6px 24px rgba(149, 225, 211, 0.3);
 }
 
@@ -863,6 +863,418 @@ body {
   color: #333;
 }
 
+/* ─── Life Buttons ─── */
+.life-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.btn-life {
+  padding: 14px 8px;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btn-life:hover {
+  transform: translateY(-2px);
+}
+
+.btn-lunch {
+  background: linear-gradient(135deg, #F38181, #d46a6a);
+}
+
+.btn-driving {
+  background: linear-gradient(135deg, #A8D8EA, #7bb8cc);
+}
+
+.btn-spotify-btn {
+  background: linear-gradient(135deg, #1DB954, #189945);
+}
+
+.btn-dashboard {
+  background: linear-gradient(135deg, #FCBAD3, #e8a0bc);
+}
+
+/* ─── Dashboard ─── */
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.dash-card {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 18px 12px;
+  text-align: center;
+  border-top: 3px solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.dash-icon {
+  font-size: 1.5rem;
+}
+
+.dash-value {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.dash-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ─── Spotify ─── */
+.spotify-intro {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 18px;
+}
+
+.btn-spotify {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 12px;
+  background: #1DB954;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btn-spotify:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(29, 185, 84, 0.3);
+}
+
+.spotify-now-playing {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+  border-left: 4px solid #1DB954;
+}
+
+.spotify-np-label {
+  font-size: 0.75rem;
+  color: #1DB954;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.spotify-np-name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.spotify-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.spotify-playlist {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: var(--bg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  font-family: var(--font-body);
+  transition: border-color 0.2s;
+}
+
+.spotify-playlist:hover,
+.spotify-playlist.active {
+  border-color: #1DB954;
+}
+
+.spotify-cover {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.spotify-pl-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.spotify-pl-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.spotify-pl-tracks {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ─── Lunch Planner ─── */
+.lunch-day {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.lunch-day-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.lunch-row {
+  display: flex;
+  gap: 12px;
+}
+
+.lunch-pick {
+  flex: 1;
+}
+
+.lunch-pick-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.lunch-select {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  appearance: none;
+  cursor: pointer;
+}
+
+.lunch-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.lunch-choice-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* ─── Driving Calendar ─── */
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cal-nav-btn {
+  background: var(--surface-light);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cal-nav-btn:hover {
+  border-color: var(--accent);
+}
+
+.cal-nav-label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.cal-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.cal-day {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 8px 6px;
+  min-height: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.cal-today {
+  border-color: var(--accent);
+}
+
+.cal-day-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.cal-day-name {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.cal-day-date {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.cal-today .cal-day-date {
+  color: var(--accent);
+}
+
+.cal-lesson {
+  background: var(--surface);
+  border-radius: 6px;
+  padding: 4px 6px;
+  margin-bottom: 4px;
+  position: relative;
+}
+
+.cal-lesson-time {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-2);
+  display: block;
+}
+
+.cal-lesson-note {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.cal-lesson-delete {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.cal-add-btn {
+  display: block;
+  width: 100%;
+  padding: 4px;
+  background: none;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.cal-add-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cal-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cal-time-input,
+.cal-note-input {
+  width: 100%;
+  padding: 4px 6px;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.75rem;
+  font-family: var(--font-body);
+}
+
+.cal-time-input:focus,
+.cal-note-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.cal-form-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.cal-save-btn {
+  flex: 1;
+  padding: 4px;
+  background: var(--accent-2);
+  color: var(--surface);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cal-cancel-btn {
+  flex: 1;
+  padding: 4px;
+  background: var(--surface-light);
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 480px) {
   .app {
@@ -882,6 +1294,34 @@ body {
   }
 
   .career-buttons {
+    flex-direction: column;
+  }
+
+  .life-buttons {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dash-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cal-week {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .cal-day {
+    min-height: auto;
+    padding: 12px;
+  }
+
+  .cal-day-header {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .lunch-row {
     flex-direction: column;
   }
 }

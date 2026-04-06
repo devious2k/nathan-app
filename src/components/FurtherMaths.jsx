@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { jsPDF } from 'jspdf';
+import { incrementStat } from './Dashboard.jsx';
 
 const STEPS = { LOADING: 'loading', PROBLEMS: 'problems', MARKING: 'marking', RESULTS: 'results' };
 
@@ -73,6 +74,7 @@ export default function FurtherMaths({ onBack, subject = 'further-maths' }) {
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setResults(data);
       setStep(STEPS.RESULTS);
+      incrementStat('questionsAttempted', problems.length);
     } catch (err) {
       setError(`Marking failed: ${err.message}`);
       setStep(STEPS.PROBLEMS);

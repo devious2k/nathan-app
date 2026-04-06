@@ -8,16 +8,24 @@ const SUBJECTS = [
   { id: 'physics', name: 'Physics', colour: '#4ECDC4', icon: '⚛️', spec: 'H556' },
 ];
 
+// Official OCR provisional timetable June 2026
+// Source: ocr.org.uk/Images/729358-june-2026-provisional-exam-timetable-as-a-level-core-maths-and-fsmq.pdf
 const EXAM_DATES = [
-  { subject: 'further-maths', paper: 'Pure Core (Paper 1)', date: '2026-05-12', time: '09:00' },
-  { subject: 'further-maths', paper: 'Pure Core (Paper 2)', date: '2026-05-21', time: '09:00' },
-  { subject: 'further-maths', paper: 'Optional Papers', date: '2026-06-05', time: '13:30' },
-  { subject: 'maths', paper: 'Pure Mathematics (Paper 1)', date: '2026-05-14', time: '09:00' },
-  { subject: 'maths', paper: 'Pure & Statistics (Paper 2)', date: '2026-05-28', time: '09:00' },
-  { subject: 'maths', paper: 'Pure & Mechanics (Paper 3)', date: '2026-06-09', time: '09:00' },
-  { subject: 'physics', paper: 'Modelling Physics (Paper 1)', date: '2026-05-15', time: '13:30' },
-  { subject: 'physics', paper: 'Exploring Physics (Paper 2)', date: '2026-05-29', time: '13:30' },
-  { subject: 'physics', paper: 'Unified Physics (Paper 3)', date: '2026-06-12', time: '09:00' },
+  // Further Mathematics A (H245) — Y540-Y545
+  { subject: 'further-maths', paper: 'Y540 Pure Core 1', date: '2026-05-14', time: '13:30' },
+  { subject: 'further-maths', paper: 'Y541 Pure Core 2', date: '2026-05-21', time: '13:30' },
+  { subject: 'further-maths', paper: 'Y542 Statistics', date: '2026-06-05', time: '13:30' },
+  { subject: 'further-maths', paper: 'Y543 Mechanics', date: '2026-06-12', time: '13:30' },
+  { subject: 'further-maths', paper: 'Y544 Discrete Maths', date: '2026-06-16', time: '13:30' },
+  { subject: 'further-maths', paper: 'Y545 Additional Pure', date: '2026-06-19', time: '13:30' },
+  // Mathematics A (H240) — H240/01-03
+  { subject: 'maths', paper: 'H240/01 Pure Mathematics', date: '2026-06-03', time: '13:30' },
+  { subject: 'maths', paper: 'H240/02 Pure & Statistics', date: '2026-06-11', time: '13:30' },
+  { subject: 'maths', paper: 'H240/03 Pure & Mechanics', date: '2026-06-18', time: '13:30' },
+  // Physics A (H556) — H556/01-03
+  { subject: 'physics', paper: 'H556/01 Modelling Physics', date: '2026-05-20', time: '13:30' },
+  { subject: 'physics', paper: 'H556/02 Exploring Physics', date: '2026-06-01', time: '09:00' },
+  { subject: 'physics', paper: 'H556/03 Unified Physics', date: '2026-06-08', time: '09:00' },
 ];
 
 function getMonday(date) {

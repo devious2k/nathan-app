@@ -151,20 +151,12 @@ export default function FurtherMaths({ onBack, subject = 'further-maths' }) {
     doc.setTextColor(120, 100, 160);
     doc.text(`${config.label} Practice`, w / 2, 95, { align: 'center' });
 
-    // Nathan's photo (left side)
-    try {
-      const nathan = await loadImage('/nathan.png');
-      const imgH = 50;
-      const imgW = imgH * (nathan.width / nathan.height);
-      doc.addImage(nathan.data, 'JPEG', w / 2 - imgW - 15, 102, imgW, imgH);
-    } catch {}
-
-    // Marcel's photo (right side)
+    // Marcel's photo (centred)
     try {
       const marcel = await loadImage('/marcel.png');
       const imgH = 50;
       const imgW = imgH * (marcel.width / marcel.height);
-      doc.addImage(marcel.data, 'JPEG', w / 2 + 15, 102, imgW, imgH);
+      doc.addImage(marcel.data, 'JPEG', (w - imgW) / 2, 102, imgW, imgH);
     } catch {}
 
     // Signed by Marcel section

@@ -35,35 +35,147 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ─── App Layout ─── */
-.app {
+/* ─── App Shell ─── */
+.app-shell {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   max-width: 640px;
   margin: 0 auto;
-  padding: 24px 16px;
+  overflow: hidden;
 }
 
 .app-header {
   text-align: center;
-  margin-bottom: 32px;
+  padding: 14px 16px 8px;
+  flex-shrink: 0;
 }
 
 .app-title {
   font-family: var(--font-heading);
-  font-size: 2rem;
+  font-size: 1.4rem;
   font-weight: 800;
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  cursor: pointer;
 }
 
-.app-subtitle {
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 16px 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Bottom Tab Bar ─── */
+.tab-bar {
+  display: flex;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px 0;
+  padding-bottom: max(6px, env(safe-area-inset-bottom));
+}
+
+.tab-bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 0;
+  background: none;
+  border: none;
   color: var(--text-muted);
-  font-size: 0.95rem;
-  margin-top: 4px;
+  cursor: pointer;
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab-bar-item.active {
+  color: var(--accent);
+}
+
+.tab-bar-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.tab-bar-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Tab Menu Pages ─── */
+.tab-menu {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.tab-menu-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.tab-menu-sub {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.tab-menu-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tab-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  transition: border-color 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab-menu-item:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.tab-menu-item:active {
+  transform: scale(0.98);
+}
+
+.tab-menu-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.tab-menu-label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  display: block;
+}
+
+.tab-menu-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: block;
 }
 
 .app-main {
@@ -315,22 +427,7 @@ body {
   color: var(--text);
 }
 
-/* ─── Footer ─── */
-.app-footer {
-  text-align: center;
-  padding: 24px 0 8px;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-
-.app-footer a {
-  color: var(--accent-2);
-  text-decoration: none;
-}
-
-.app-footer a:hover {
-  text-decoration: underline;
-}
+/* ─── Footer (hidden in app shell, kept for fallback) ─── */
 
 /* ─── Divider ─── */
 .divider {
@@ -1277,28 +1374,20 @@ body {
 
 /* ─── Responsive ─── */
 @media (max-width: 480px) {
-  .app {
-    padding: 16px 12px;
+  .app-header {
+    padding: 10px 12px 6px;
   }
 
   .app-title {
-    font-size: 1.6rem;
+    font-size: 1.2rem;
+  }
+
+  .app-content {
+    padding: 6px 12px 12px;
   }
 
   .card {
-    padding: 20px 16px;
-  }
-
-  .subject-buttons {
-    flex-direction: column;
-  }
-
-  .career-buttons {
-    flex-direction: column;
-  }
-
-  .life-buttons {
-    grid-template-columns: 1fr 1fr;
+    padding: 18px 14px;
   }
 
   .dash-grid {

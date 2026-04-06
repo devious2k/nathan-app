@@ -13,10 +13,19 @@ const MANDATORY_FIRST = "Check Jamie has Coca Cola and go to Simon's 🥤";
 
 const STEPS = { INPUT: 'input', LOADING: 'loading', RESULTS: 'results' };
 
+const TABS = [
+  { id: 'home', icon: '🎲', label: 'Home' },
+  { id: 'study', icon: '📐', label: 'Study' },
+  { id: 'career', icon: '💼', label: 'Career' },
+  { id: 'life', icon: '🍽️', label: 'Life' },
+  { id: 'dashboard', icon: '📊', label: 'Stats' },
+];
+
 export default function App() {
-  const [step, setStep] = useState(STEPS.INPUT);
-  const [mode, setMode] = useState('decision');
+  const [tab, setTab] = useState('home');
+  const [mode, setMode] = useState(null);
   const [subject, setSubject] = useState(null);
+  const [step, setStep] = useState(STEPS.INPUT);
   const [interests, setInterests] = useState('');
   const [goals, setGoals] = useState('');
   const [plan, setPlan] = useState('');
@@ -25,7 +34,8 @@ export default function App() {
   const [winner, setWinner] = useState(null);
   const [error, setError] = useState('');
 
-  const goHome = () => { setMode('decision'); setSubject(null); };
+  const switchTab = (id) => { setTab(id); setMode(null); setSubject(null); };
+  const goHome = () => { setTab('home'); setMode(null); setSubject(null); setStep(STEPS.INPUT); };
 
   const handleGenerate = async () => {
     if (!interests.trim() && !goals.trim()) {
@@ -42,14 +52,8 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ interests, goals }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || `HTTP ${res.status}`);
-      }
-
-      // Mandatory first option is always prepended client-side
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       const options = [MANDATORY_FIRST, ...data.wheelOptions.slice(0, 7)];
       setWheelOptions(options);
       setPlan(data.plan);
@@ -60,214 +64,183 @@ export default function App() {
     }
   };
 
-  const handleSpin = () => {
-    if (spinning) return;
-    setWinner(null);
-    setSpinning(true);
-  };
-
-  const handleSpinEnd = (result) => {
-    setSpinning(false);
-    setWinner(result);
-  };
-
-  const handleReset = () => {
-    setStep(STEPS.INPUT);
-    setWinner(null);
-    setSpinning(false);
-    setError('');
-  };
+  const handleSpin = () => { if (!spinning) { setWinner(null); setSpinning(true); } };
+  const handleSpinEnd = (result) => { setSpinning(false); setWinner(result); };
+  const handleReset = () => { setStep(STEPS.INPUT); setWinner(null); setSpinning(false); setError(''); };
 
   return (
-    <div className="app">
+    <div className="app-shell">
       <header className="app-header">
-        <h1 className="app-title" onClick={goHome} style={{ cursor: 'pointer' }}>
-          🎲 Nathan's Decision Maker
-        </h1>
-        <p className="app-subtitle">Because Nathan will NEVER decide on his own 😂</p>
+        <h1 className="app-title" onClick={goHome}>🎲 Nathan's Decision Maker</h1>
       </header>
 
-      <main className="app-main">
+      <main className="app-content">
 
-        {/* ─── STUDY MODE ─── */}
-        {mode === 'study' && (
-          <FurtherMaths key={subject} subject={subject} onBack={goHome} />
-        )}
+        {/* ═══ HOME TAB ═══ */}
+        {tab === 'home' && !mode && (
+          <>
+            {step === STEPS.INPUT && (
+              <div className="card">
+                <span className="badge">⏳ Stop. Overthinking. Now.</span>
 
-        {/* ─── APPRENTICESHIPS ─── */}
-        {mode === 'apprenticeships' && (
-          <Apprenticeships onBack={goHome} />
-        )}
+                <label className="field-label" htmlFor="interests">What are you into today?</label>
+                <textarea
+                  id="interests" className="field-textarea" rows={3}
+                  placeholder="e.g. gaming, going out, food, music, chilling..."
+                  value={interests} onChange={(e) => setInterests(e.target.value)}
+                />
 
-        {/* ─── CV GENERATOR ─── */}
-        {mode === 'cv' && (
-          <CVGenerator onBack={goHome} />
-        )}
+                <label className="field-label" htmlFor="goals">What do you actually want to achieve?</label>
+                <textarea
+                  id="goals" className="field-textarea" rows={3}
+                  placeholder="e.g. be productive, have fun, get some fresh air, eat something good..."
+                  value={goals} onChange={(e) => setGoals(e.target.value)}
+                />
 
-        {/* ─── DASHBOARD ─── */}
-        {mode === 'dashboard' && (
-          <Dashboard onBack={goHome} />
-        )}
+                {error && <p className="error-msg">{error}</p>}
 
-        {/* ─── SPOTIFY ─── */}
-        {mode === 'spotify' && (
-          <SpotifyPicker onBack={goHome} />
-        )}
-
-        {/* ─── LUNCH PLANNER ─── */}
-        {mode === 'lunch' && (
-          <LunchPlanner onBack={goHome} />
-        )}
-
-        {/* ─── DRIVING CALENDAR ─── */}
-        {mode === 'driving' && (
-          <DrivingCalendar onBack={goHome} />
-        )}
-
-        {/* ─── INPUT STEP ─── */}
-        {mode === 'decision' && step === STEPS.INPUT && (
-          <div className="card">
-            <span className="badge">⏳ Stop. Overthinking. Now.</span>
-
-            <label className="field-label" htmlFor="interests">
-              What are you into today?
-            </label>
-            <textarea
-              id="interests"
-              className="field-textarea"
-              rows={3}
-              placeholder="e.g. gaming, going out, food, music, chilling..."
-              value={interests}
-              onChange={(e) => setInterests(e.target.value)}
-            />
-
-            <label className="field-label" htmlFor="goals">
-              What do you actually want to achieve?
-            </label>
-            <textarea
-              id="goals"
-              className="field-textarea"
-              rows={3}
-              placeholder="e.g. be productive, have fun, get some fresh air, eat something good..."
-              value={goals}
-              onChange={(e) => setGoals(e.target.value)}
-            />
-
-            {error && <p className="error-msg">{error}</p>}
-
-            <button className="btn-primary" onClick={handleGenerate}>
-              Sort My Day Out 🚀
-            </button>
-
-            <div className="divider">
-              <span className="divider-text">or revise</span>
-            </div>
-
-            <div className="subject-buttons">
-              <button className="btn-subject btn-further-maths" onClick={() => { setSubject('further-maths'); setMode('study'); }}>
-                📐 Further Maths
-              </button>
-              <button className="btn-subject btn-maths-subject" onClick={() => { setSubject('maths'); setMode('study'); }}>
-                📊 Maths
-              </button>
-              <button className="btn-subject btn-physics" onClick={() => { setSubject('physics'); setMode('study'); }}>
-                ⚛️ Physics
-              </button>
-            </div>
-
-            <div className="divider">
-              <span className="divider-text">or sort your career</span>
-            </div>
-
-            <div className="career-buttons">
-              <button className="btn-career btn-apprenticeships" onClick={() => setMode('apprenticeships')}>
-                💼 Find Apprenticeships
-              </button>
-              <button className="btn-career btn-cv-btn" onClick={() => setMode('cv')}>
-                📝 CV Generator
-              </button>
-            </div>
-
-            <div className="divider">
-              <span className="divider-text">or sort your life</span>
-            </div>
-
-            <div className="life-buttons">
-              <button className="btn-life btn-lunch" onClick={() => setMode('lunch')}>
-                🥪 Lunch Planner
-              </button>
-              <button className="btn-life btn-driving" onClick={() => setMode('driving')}>
-                🚗 Driving Lessons
-              </button>
-              <button className="btn-life btn-spotify-btn" onClick={() => setMode('spotify')}>
-                🎵 Spotify
-              </button>
-              <button className="btn-life btn-dashboard" onClick={() => setMode('dashboard')}>
-                📊 Dashboard
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ─── LOADING STEP ─── */}
-        {mode === 'decision' && step === STEPS.LOADING && (
-          <div className="card card-center">
-            <div className="spinner" />
-            <p className="loading-title">Figuring out your life...</p>
-            <p className="loading-sub">
-              (This still took less time than Nathan deciding what to eat 😂)
-            </p>
-          </div>
-        )}
-
-        {/* ─── RESULTS STEP ─── */}
-        {mode === 'decision' && step === STEPS.RESULTS && (
-          <div className="card">
-            {/* Day plan */}
-            <div className="plan-box">
-              <p className="plan-title">📋 Your Day Plan</p>
-              <p className="plan-text">{plan}</p>
-            </div>
-
-            {/* Wheel section */}
-            <div className="wheel-section">
-              <div className="wheel-header">
-                <span className="badge">🎡 The Wheel of Fate</span>
-                <p className="wheel-sub">Spin it. Do what it says. No backsies.</p>
+                <button className="btn-primary" onClick={handleGenerate}>
+                  Sort My Day Out 🚀
+                </button>
               </div>
+            )}
 
-              <SpinWheel
-                options={wheelOptions}
-                spinning={spinning}
-                onSpinEnd={handleSpinEnd}
-              />
+            {step === STEPS.LOADING && (
+              <div className="card card-center">
+                <div className="spinner" />
+                <p className="loading-title">Figuring out your life...</p>
+                <p className="loading-sub">(This still took less time than Nathan deciding what to eat 😂)</p>
+              </div>
+            )}
 
-              <button
-                className="btn-spin"
-                onClick={handleSpin}
-                disabled={spinning}
-              >
-                {spinning ? 'Spinning... 🌀' : 'SPIN THE WHEEL 🎯'}
-              </button>
-
-              {winner && (
-                <div className="winner-box">
-                  <p className="winner-title">The Wheel Has Spoken! 🎉</p>
-                  <p className="winner-text">{winner}</p>
+            {step === STEPS.RESULTS && (
+              <div className="card">
+                <div className="plan-box">
+                  <p className="plan-title">📋 Your Day Plan</p>
+                  <p className="plan-text">{plan}</p>
                 </div>
-              )}
+                <div className="wheel-section">
+                  <div className="wheel-header">
+                    <span className="badge">🎡 The Wheel of Fate</span>
+                    <p className="wheel-sub">Spin it. Do what it says. No backsies.</p>
+                  </div>
+                  <SpinWheel options={wheelOptions} spinning={spinning} onSpinEnd={handleSpinEnd} />
+                  <button className="btn-spin" onClick={handleSpin} disabled={spinning}>
+                    {spinning ? 'Spinning... 🌀' : 'SPIN THE WHEEL 🎯'}
+                  </button>
+                  {winner && (
+                    <div className="winner-box">
+                      <p className="winner-title">The Wheel Has Spoken! 🎉</p>
+                      <p className="winner-text">{winner}</p>
+                    </div>
+                  )}
+                  <button className="btn-reset" onClick={handleReset}>← Start Over (yes, again)</button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
-              <button className="btn-reset" onClick={handleReset}>
-                ← Start Over (yes, again)
+        {/* ═══ STUDY TAB ═══ */}
+        {tab === 'study' && !mode && (
+          <div className="tab-menu">
+            <h2 className="tab-menu-title">📐 Revision</h2>
+            <p className="tab-menu-sub">Pick a subject, Nathan. No more excuses.</p>
+            <div className="tab-menu-grid">
+              <button className="tab-menu-item" onClick={() => { setSubject('further-maths'); setMode('study'); }}>
+                <span className="tab-menu-icon">📐</span>
+                <span className="tab-menu-label">Further Maths</span>
+                <span className="tab-menu-desc">OCR H245</span>
+              </button>
+              <button className="tab-menu-item" onClick={() => { setSubject('maths'); setMode('study'); }}>
+                <span className="tab-menu-icon">📊</span>
+                <span className="tab-menu-label">Maths</span>
+                <span className="tab-menu-desc">OCR H240</span>
+              </button>
+              <button className="tab-menu-item" onClick={() => { setSubject('physics'); setMode('study'); }}>
+                <span className="tab-menu-icon">⚛️</span>
+                <span className="tab-menu-label">Physics</span>
+                <span className="tab-menu-desc">OCR H556</span>
               </button>
             </div>
           </div>
         )}
+        {tab === 'study' && mode === 'study' && (
+          <FurtherMaths key={subject} subject={subject} onBack={() => setMode(null)} />
+        )}
+
+        {/* ═══ CAREER TAB ═══ */}
+        {tab === 'career' && !mode && (
+          <div className="tab-menu">
+            <h2 className="tab-menu-title">💼 Career</h2>
+            <p className="tab-menu-sub">Sort your future out, Nathan.</p>
+            <div className="tab-menu-grid">
+              <button className="tab-menu-item" onClick={() => setMode('apprenticeships')}>
+                <span className="tab-menu-icon">🔍</span>
+                <span className="tab-menu-label">Find Apprenticeships</span>
+                <span className="tab-menu-desc">Level 4, 5 & 6</span>
+              </button>
+              <button className="tab-menu-item" onClick={() => setMode('cv')}>
+                <span className="tab-menu-icon">📝</span>
+                <span className="tab-menu-label">CV Generator</span>
+                <span className="tab-menu-desc">+ Cover Letters</span>
+              </button>
+            </div>
+          </div>
+        )}
+        {tab === 'career' && mode === 'apprenticeships' && (
+          <Apprenticeships onBack={() => setMode(null)} />
+        )}
+        {tab === 'career' && mode === 'cv' && (
+          <CVGenerator onBack={() => setMode(null)} />
+        )}
+
+        {/* ═══ LIFE TAB ═══ */}
+        {tab === 'life' && !mode && (
+          <div className="tab-menu">
+            <h2 className="tab-menu-title">🍽️ Life</h2>
+            <p className="tab-menu-sub">The boring bits, sorted.</p>
+            <div className="tab-menu-grid">
+              <button className="tab-menu-item" onClick={() => setMode('lunch')}>
+                <span className="tab-menu-icon">🥪</span>
+                <span className="tab-menu-label">Lunch Planner</span>
+                <span className="tab-menu-desc">Sandwiches & Snacks</span>
+              </button>
+              <button className="tab-menu-item" onClick={() => setMode('driving')}>
+                <span className="tab-menu-icon">🚗</span>
+                <span className="tab-menu-label">Driving Lessons</span>
+                <span className="tab-menu-desc">Weekly Calendar</span>
+              </button>
+              <button className="tab-menu-item" onClick={() => setMode('spotify')}>
+                <span className="tab-menu-icon">🎵</span>
+                <span className="tab-menu-label">Spotify</span>
+                <span className="tab-menu-desc">Day Playlist</span>
+              </button>
+            </div>
+          </div>
+        )}
+        {tab === 'life' && mode === 'lunch' && <LunchPlanner onBack={() => setMode(null)} />}
+        {tab === 'life' && mode === 'driving' && <DrivingCalendar onBack={() => setMode(null)} />}
+        {tab === 'life' && mode === 'spotify' && <SpotifyPicker onBack={() => setMode(null)} />}
+
+        {/* ═══ DASHBOARD TAB ═══ */}
+        {tab === 'dashboard' && <Dashboard onBack={goHome} />}
+
       </main>
 
-      <footer className="app-footer">
-        <p>Made with 💛 by <a href="https://gameonsolutions.uk" target="_blank" rel="noreferrer">Game On Solutions</a></p>
-      </footer>
+      {/* ═══ BOTTOM TAB BAR ═══ */}
+      <nav className="tab-bar">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            className={`tab-bar-item ${tab === t.id ? 'active' : ''}`}
+            onClick={() => switchTab(t.id)}
+          >
+            <span className="tab-bar-icon">{t.icon}</span>
+            <span className="tab-bar-label">{t.label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }

@@ -1372,6 +1372,245 @@ body {
   cursor: pointer;
 }
 
+/* ─── Notifications ─── */
+.notif-container {
+  margin-bottom: 12px;
+}
+
+.notif-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 6px;
+  border-left: 4px solid;
+  animation: notif-slide 0.3s ease-out;
+}
+
+@keyframes notif-slide {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.notif-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.notif-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.notif-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notif-body {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notif-dismiss {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 0 0 10px;
+  flex-shrink: 0;
+}
+
+.notif-toggle {
+  display: block;
+  width: 100%;
+  padding: 6px;
+  background: none;
+  border: none;
+  color: var(--accent-2);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* ─── Revision Calendar ─── */
+.rev-exams {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.rev-exams-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.rev-exam-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: var(--surface);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  border-left: 3px solid;
+}
+
+.rev-exam-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rev-exam-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.rev-exam-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.rev-exam-countdown {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--accent-2);
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.rev-exam-countdown.urgent {
+  color: var(--danger);
+}
+
+.rev-week {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.rev-day {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.rev-today {
+  border-color: var(--accent);
+}
+
+.rev-past {
+  opacity: 0.5;
+}
+
+.rev-day-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.rev-day-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.rev-day-date {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.rev-today .rev-day-date {
+  color: var(--accent);
+}
+
+.rev-exam-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 6px 10px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.rev-session {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  border-left: 3px solid;
+}
+
+.rev-session-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rev-session-time {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.rev-session-subject {
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: block;
+}
+
+.rev-session-topic {
+  font-size: 0.8rem;
+  color: var(--text);
+  display: block;
+  margin-top: 2px;
+}
+
+.rev-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.tab-menu-featured {
+  border: 1px solid var(--accent);
+  background: rgba(255, 230, 109, 0.05);
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 480px) {
   .app-header {

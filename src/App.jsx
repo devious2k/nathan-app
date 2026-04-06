@@ -7,6 +7,8 @@ import Dashboard from './components/Dashboard.jsx';
 import SpotifyPicker from './components/SpotifyPicker.jsx';
 import LunchPlanner from './components/LunchPlanner.jsx';
 import DrivingCalendar from './components/DrivingCalendar.jsx';
+import RevisionCalendar from './components/RevisionCalendar.jsx';
+import Notifications from './components/Notifications.jsx';
 
 // This option is ALWAYS first on the wheel — non-negotiable
 const MANDATORY_FIRST = "Check Jamie has Coca Cola and go to Simon's 🥤";
@@ -75,6 +77,7 @@ export default function App() {
       </header>
 
       <main className="app-content">
+        <Notifications />
 
         {/* ═══ HOME TAB ═══ */}
         {tab === 'home' && !mode && (
@@ -147,6 +150,11 @@ export default function App() {
             <h2 className="tab-menu-title">📐 Revision</h2>
             <p className="tab-menu-sub">Pick a subject, Nathan. No more excuses.</p>
             <div className="tab-menu-grid">
+              <button className="tab-menu-item tab-menu-featured" onClick={() => setMode('revision-calendar')}>
+                <span className="tab-menu-icon">📅</span>
+                <span className="tab-menu-label">Revision Calendar</span>
+                <span className="tab-menu-desc">May & June exam timetable</span>
+              </button>
               <button className="tab-menu-item" onClick={() => { setSubject('further-maths'); setMode('study'); }}>
                 <span className="tab-menu-icon">📐</span>
                 <span className="tab-menu-label">Further Maths</span>
@@ -167,6 +175,9 @@ export default function App() {
         )}
         {tab === 'study' && mode === 'study' && (
           <FurtherMaths key={subject} subject={subject} onBack={() => setMode(null)} />
+        )}
+        {tab === 'study' && mode === 'revision-calendar' && (
+          <RevisionCalendar onBack={() => setMode(null)} />
         )}
 
         {/* ═══ CAREER TAB ═══ */}

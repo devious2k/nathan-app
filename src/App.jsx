@@ -12,6 +12,7 @@ import Notifications from './components/Notifications.jsx';
 import WeekOverview from './components/WeekOverview.jsx';
 import NowPlaying from './components/NowPlaying.jsx';
 import RevisionWorksheet from './components/RevisionWorksheet.jsx';
+import Marcel from './components/Marcel.jsx';
 import Activities from './components/Activities.jsx';
 import JobSearch from './components/JobSearch.jsx';
 import Goals from './components/Goals.jsx';
@@ -291,6 +292,8 @@ export default function App() {
           </button>
         ))}
       </nav>
+
+      <Marcel />
     </div>
   );
 }

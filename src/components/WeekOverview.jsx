@@ -22,7 +22,7 @@ function getWeekDays(monday) {
   });
 }
 
-export default function WeekOverview() {
+export default function WeekOverview({ onStartSession }) {
   const [data, setData] = useState({ revision: {}, driving: {}, goals: [] });
 
   useEffect(() => {
@@ -84,11 +84,17 @@ export default function WeekOverview() {
 
                 {revSessions.map(session => {
                   const sub = SUBJECTS.find(s => s.id === session.subject);
+                  const clickable = !isPast && onStartSession;
                   return (
-                    <div key={`rev-${session.id}`} className="wo-item wo-revision" style={{ borderLeftColor: sub?.colour }}>
+                    <div
+                      key={`rev-${session.id}`}
+                      className={`wo-item wo-revision ${clickable ? 'wo-clickable' : ''}`}
+                      style={{ borderLeftColor: sub?.colour }}
+                      onClick={clickable ? () => onStartSession(session) : undefined}
+                    >
                       <span className="wo-item-icon">{sub?.icon}</span>
                       <span className="wo-item-text">{session.topic}</span>
-                      <span className="wo-item-time">{session.time}</span>
+                      <span className="wo-item-time">{clickable ? '▶' : session.time}</span>
                     </div>
                   );
                 })}

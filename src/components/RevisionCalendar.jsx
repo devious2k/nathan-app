@@ -144,7 +144,7 @@ function generateDefaultPlan() {
   return plan;
 }
 
-export default function RevisionCalendar({ onBack }) {
+export default function RevisionCalendar({ onBack, onStartSession }) {
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()));
   const [plan, setPlan] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -267,11 +267,17 @@ export default function RevisionCalendar({ onBack }) {
 
               {sessions.map(session => {
                 const sub = SUBJECTS.find(s => s.id === session.subject);
+                const canStart = !isPast && onStartSession;
                 return (
-                  <div key={session.id} className="rev-session" style={{ borderLeftColor: sub?.colour }}>
+                  <div
+                    key={session.id}
+                    className={`rev-session ${canStart ? 'wo-clickable' : ''}`}
+                    style={{ borderLeftColor: sub?.colour }}
+                    onClick={canStart ? () => onStartSession(session) : undefined}
+                  >
                     <div className="rev-session-top">
-                      <span className="rev-session-time">{session.time}</span>
-                      <button className="cal-lesson-delete" onClick={() => deleteSession(key, session.id)}>×</button>
+                      <span className="rev-session-time">{canStart ? '▶ Start' : session.time}</span>
+                      <button className="cal-lesson-delete" onClick={(e) => { e.stopPropagation(); deleteSession(key, session.id); }}>×</button>
                     </div>
                     <span className="rev-session-subject" style={{ color: sub?.colour }}>
                       {sub?.icon} {sub?.name}

@@ -11,6 +11,7 @@ import RevisionCalendar from './components/RevisionCalendar.jsx';
 import Notifications from './components/Notifications.jsx';
 import WeekOverview from './components/WeekOverview.jsx';
 import NowPlaying from './components/NowPlaying.jsx';
+import RevisionWorksheet from './components/RevisionWorksheet.jsx';
 import Activities from './components/Activities.jsx';
 import JobSearch from './components/JobSearch.jsx';
 import Goals from './components/Goals.jsx';
@@ -40,9 +41,11 @@ export default function App() {
   const [spinning, setSpinning] = useState(false);
   const [winner, setWinner] = useState(null);
   const [error, setError] = useState('');
+  const [activeWorksheet, setActiveWorksheet] = useState(null);
 
-  const switchTab = (id) => { setTab(id); setMode(null); setSubject(null); };
-  const goHome = () => { setTab('home'); setMode(null); setSubject(null); setStep(STEPS.INPUT); };
+  const switchTab = (id) => { setTab(id); setMode(null); setSubject(null); setActiveWorksheet(null); };
+  const goHome = () => { setTab('home'); setMode(null); setSubject(null); setStep(STEPS.INPUT); setActiveWorksheet(null); };
+  const startSession = (session) => { setActiveWorksheet(session); };
 
   const handleGenerate = async () => {
     if (!interests.trim() && !goals.trim()) {
@@ -84,11 +87,19 @@ export default function App() {
       <main className="app-content">
         <Notifications />
 
+        {/* ═══ ACTIVE WORKSHEET (overrides everything) ═══ */}
+        {activeWorksheet && (
+          <RevisionWorksheet
+            session={activeWorksheet}
+            onBack={() => setActiveWorksheet(null)}
+          />
+        )}
+
         {/* ═══ HOME TAB ═══ */}
-        {tab === 'home' && !mode && (
+        {!activeWorksheet && tab === 'home' && !mode && (
           <>
             <NowPlaying />
-            <WeekOverview />
+            <WeekOverview onStartSession={startSession} />
 
             {step === STEPS.INPUT && (
               <div className="card">
@@ -153,7 +164,7 @@ export default function App() {
         )}
 
         {/* ═══ STUDY TAB ═══ */}
-        {tab === 'study' && !mode && (
+        {!activeWorksheet && tab === 'study' && !mode && (
           <div className="tab-menu">
             <h2 className="tab-menu-title">📐 Revision</h2>
             <p className="tab-menu-sub">Pick a subject, Nathan. No more excuses.</p>
@@ -181,11 +192,11 @@ export default function App() {
             </div>
           </div>
         )}
-        {tab === 'study' && mode === 'study' && (
+        {!activeWorksheet && tab === 'study' && mode === 'study' && (
           <FurtherMaths key={subject} subject={subject} onBack={() => setMode(null)} />
         )}
-        {tab === 'study' && mode === 'revision-calendar' && (
-          <RevisionCalendar onBack={() => setMode(null)} />
+        {!activeWorksheet && tab === 'study' && mode === 'revision-calendar' && (
+          <RevisionCalendar onBack={() => setMode(null)} onStartSession={startSession} />
         )}
 
         {/* ═══ CAREER TAB ═══ */}

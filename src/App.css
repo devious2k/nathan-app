@@ -2088,6 +2088,89 @@ body {
   flex-shrink: 0;
 }
 
+/* ─── Revision Worksheet ─── */
+.ws-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.ws-timer {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.ws-topic-bar {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border-left: 4px solid;
+}
+
+.ws-topic-subject {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.ws-topic-name {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ws-question {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.ws-q-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.ws-q-num {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.ws-q-marks {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.ws-q-text {
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+/* Clickable items */
+.wo-clickable {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.wo-clickable:hover {
+  background: var(--surface-light);
+}
+
+.wo-clickable:active {
+  transform: scale(0.98);
+}
+
 .tab-menu-featured {
   border: 1px solid var(--accent);
   background: rgba(255, 230, 109, 0.05);

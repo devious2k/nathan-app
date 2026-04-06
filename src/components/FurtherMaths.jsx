@@ -88,79 +88,106 @@ export default function FurtherMaths({ onBack, subject = 'further-maths' }) {
     }));
   }
 
+  async function loadImage(src) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = src;
+    await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; });
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    return { data: canvas.toDataURL('image/jpeg', 0.85), width: img.width, height: img.height };
+  }
+
   async function downloadCertificate() {
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const w = doc.internal.pageSize.getWidth();
     const h = doc.internal.pageSize.getHeight();
 
-    // Background
-    doc.setFillColor(15, 15, 35);
+    // White background (saves ink!)
+    doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, w, h, 'F');
 
-    // Gold border
-    doc.setDrawColor(255, 230, 109);
-    doc.setLineWidth(3);
+    // Thin elegant border
+    doc.setDrawColor(60, 60, 80);
+    doc.setLineWidth(2);
     doc.rect(10, 10, w - 20, h - 20);
-    doc.setLineWidth(1);
-    doc.rect(14, 14, w - 28, h - 28);
+    doc.setLineWidth(0.5);
+    doc.rect(13, 13, w - 26, h - 26);
 
     // Title
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(42);
-    doc.setTextColor(255, 230, 109);
-    doc.text('CERTIFICATE OF ACHIEVEMENT', w / 2, 45, { align: 'center' });
+    doc.setFontSize(38);
+    doc.setTextColor(30, 30, 50);
+    doc.text('CERTIFICATE OF ACHIEVEMENT', w / 2, 40, { align: 'center' });
+
+    // Decorative line
+    doc.setDrawColor(170, 150, 218);
+    doc.setLineWidth(1);
+    doc.line(w / 2 - 60, 46, w / 2 + 60, 46);
 
     // Smiley
-    doc.setFontSize(36);
-    doc.text('😊', w / 2, 62, { align: 'center' });
+    doc.setFontSize(28);
+    doc.text(':)', w / 2, 58, { align: 'center' });
 
     // Well done
-    doc.setFontSize(28);
-    doc.setTextColor(78, 205, 196);
-    doc.text('Well Done Nathan!', w / 2, 80, { align: 'center' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(26);
+    doc.setTextColor(80, 60, 140);
+    doc.text('Well Done Nathan!', w / 2, 72, { align: 'center' });
 
     // Score
-    doc.setFontSize(20);
-    doc.setTextColor(230, 230, 240);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(18);
+    doc.setTextColor(60, 60, 80);
     doc.text(
       `You scored ${results.totalMarks} out of ${results.totalAvailable} marks`,
-      w / 2, 95, { align: 'center' }
+      w / 2, 85, { align: 'center' }
     );
 
-    doc.setFontSize(16);
-    doc.setTextColor(170, 150, 218);
-    doc.text(`${config.label} Practice`, w / 2, 108, { align: 'center' });
+    doc.setFontSize(14);
+    doc.setTextColor(120, 100, 160);
+    doc.text(`${config.label} Practice`, w / 2, 95, { align: 'center' });
 
-    // Load and add Nathan's photo
+    // Nathan's photo (left side)
     try {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.src = '/nathan.png';
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-      });
+      const nathan = await loadImage('/nathan.png');
+      const imgH = 50;
+      const imgW = imgH * (nathan.width / nathan.height);
+      doc.addImage(nathan.data, 'JPEG', w / 2 - imgW - 15, 102, imgW, imgH);
+    } catch {}
 
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      const imgData = canvas.toDataURL('image/jpeg', 0.8);
+    // Marcel's photo (right side)
+    try {
+      const marcel = await loadImage('/marcel.png');
+      const imgH = 50;
+      const imgW = imgH * (marcel.width / marcel.height);
+      doc.addImage(marcel.data, 'JPEG', w / 2 + 15, 102, imgW, imgH);
+    } catch {}
 
-      const imgH = 65;
-      const imgW = imgH * (img.width / img.height);
-      doc.addImage(imgData, 'JPEG', (w - imgW) / 2, 115, imgW, imgH);
-    } catch {
-      // If image fails, just skip it
-    }
+    // Signed by Marcel section
+    doc.setDrawColor(60, 60, 80);
+    doc.setLineWidth(0.5);
+    doc.line(w / 2 - 40, h - 38, w / 2 + 40, h - 38);
+
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(16);
+    doc.setTextColor(80, 60, 140);
+    doc.text('Marcel', w / 2, h - 32, { align: 'center' });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(130, 130, 150);
+    doc.text('Signed by Marcel — Chief Examiner & Grumpy Cat', w / 2, h - 26, { align: 'center' });
 
     // Footer
-    doc.setFontSize(11);
-    doc.setTextColor(152, 152, 176);
+    doc.setFontSize(9);
+    doc.setTextColor(150, 150, 170);
     const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    doc.text(today, w / 2, h - 22, { align: 'center' });
-    doc.text("Nathan's Decision Maker — gameonsolutions.uk", w / 2, h - 28, { align: 'center' });
+    doc.text(today, w / 2, h - 18, { align: 'center' });
+    doc.text("Nathan's Decision Maker — gameonsolutions.uk", w / 2, h - 14, { align: 'center' });
 
     doc.save('nathan-certificate.pdf');
   }

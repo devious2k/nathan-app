@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const CLIENT_ID = ''; // Set via env or hardcode a public Spotify app client ID
+const CLIENT_ID = 'ea05b7bce4914f5d9b39c28eeabc9f37';
 const REDIRECT_URI = typeof window !== 'undefined' ? `${window.location.origin}/` : '';
 const SCOPES = 'user-read-playback-state user-modify-playback-state playlist-read-private';
 
@@ -51,9 +51,7 @@ export default function SpotifyPicker({ onBack }) {
   }, []);
 
   function handleLogin() {
-    const spotifyClientId = CLIENT_ID || prompt('Enter your Spotify App Client ID (from developer.spotify.com):');
-    if (!spotifyClientId) return;
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${spotifyClientId}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
+    const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
     window.location.href = authUrl;
   }
 
